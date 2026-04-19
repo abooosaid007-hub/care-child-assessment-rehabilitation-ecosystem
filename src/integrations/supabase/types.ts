@@ -14,7 +14,242 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      assessments: {
+        Row: {
+          ai_draft_output: string | null
+          ai_generated_at: string | null
+          approved_at: string | null
+          assessment_date: string | null
+          assessment_type: string | null
+          consultant_name: string | null
+          created_at: string
+          created_by: string | null
+          form_data: Json
+          id: string
+          psychologist_notes: string | null
+          psychologist_status: string
+          student_id: string
+        }
+        Insert: {
+          ai_draft_output?: string | null
+          ai_generated_at?: string | null
+          approved_at?: string | null
+          assessment_date?: string | null
+          assessment_type?: string | null
+          consultant_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          form_data?: Json
+          id?: string
+          psychologist_notes?: string | null
+          psychologist_status?: string
+          student_id: string
+        }
+        Update: {
+          ai_draft_output?: string | null
+          ai_generated_at?: string | null
+          approved_at?: string | null
+          assessment_date?: string | null
+          assessment_type?: string | null
+          consultant_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          form_data?: Json
+          id?: string
+          psychologist_notes?: string | null
+          psychologist_status?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessments_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assessments_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      daily_logs: {
+        Row: {
+          attention_level: number | null
+          attention_minutes: number | null
+          behavioral_incidents: number
+          created_at: string
+          created_by: string | null
+          emotional_regulation: number | null
+          emotional_trigger: string | null
+          id: string
+          incident_description: string | null
+          intervention_effectiveness: number | null
+          intervention_used: string | null
+          log_date: string
+          prompt_dependency: string | null
+          session_time: string | null
+          skill_performance: string | null
+          skill_practiced: string | null
+          student_id: string
+          teacher_notes: string | null
+        }
+        Insert: {
+          attention_level?: number | null
+          attention_minutes?: number | null
+          behavioral_incidents?: number
+          created_at?: string
+          created_by?: string | null
+          emotional_regulation?: number | null
+          emotional_trigger?: string | null
+          id?: string
+          incident_description?: string | null
+          intervention_effectiveness?: number | null
+          intervention_used?: string | null
+          log_date?: string
+          prompt_dependency?: string | null
+          session_time?: string | null
+          skill_performance?: string | null
+          skill_practiced?: string | null
+          student_id: string
+          teacher_notes?: string | null
+        }
+        Update: {
+          attention_level?: number | null
+          attention_minutes?: number | null
+          behavioral_incidents?: number
+          created_at?: string
+          created_by?: string | null
+          emotional_regulation?: number | null
+          emotional_trigger?: string | null
+          id?: string
+          incident_description?: string | null
+          intervention_effectiveness?: number | null
+          intervention_used?: string | null
+          log_date?: string
+          prompt_dependency?: string | null
+          session_time?: string | null
+          skill_performance?: string | null
+          skill_practiced?: string | null
+          student_id?: string
+          teacher_notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_logs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "daily_logs_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          active: boolean
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          role: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          role?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          role?: string
+        }
+        Relationships: []
+      }
+      students: {
+        Row: {
+          assessment_status: string
+          class_section: string | null
+          comorbid_conditions: string[]
+          complexity_flag: string | null
+          created_at: string
+          created_by: string | null
+          date_of_birth: string
+          enrollment_date: string | null
+          first_name: string
+          gender: string | null
+          id: string
+          observation_notes: string | null
+          primary_condition: string
+          severity: string | null
+          status: string
+          student_code: string
+          under_observation: string[]
+        }
+        Insert: {
+          assessment_status?: string
+          class_section?: string | null
+          comorbid_conditions?: string[]
+          complexity_flag?: string | null
+          created_at?: string
+          created_by?: string | null
+          date_of_birth: string
+          enrollment_date?: string | null
+          first_name: string
+          gender?: string | null
+          id?: string
+          observation_notes?: string | null
+          primary_condition: string
+          severity?: string | null
+          status?: string
+          student_code?: string
+          under_observation?: string[]
+        }
+        Update: {
+          assessment_status?: string
+          class_section?: string | null
+          comorbid_conditions?: string[]
+          complexity_flag?: string | null
+          created_at?: string
+          created_by?: string | null
+          date_of_birth?: string
+          enrollment_date?: string | null
+          first_name?: string
+          gender?: string | null
+          id?: string
+          observation_notes?: string | null
+          primary_condition?: string
+          severity?: string | null
+          status?: string
+          student_code?: string
+          under_observation?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "students_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
