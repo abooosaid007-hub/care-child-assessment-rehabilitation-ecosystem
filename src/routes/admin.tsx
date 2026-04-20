@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Users, ClipboardCheck, AlertTriangle, FileText, UserPlus, Eye } from "lucide-react";
+import { AddStudentDialog } from "@/components/AddStudentDialog";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -49,6 +50,8 @@ function AdminDashboard() {
   const [recent, setRecent] = useState<StudentRow[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [dataError, setDataError] = useState<string | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     if (loading) return;
@@ -122,7 +125,7 @@ function AdminDashboard() {
     return () => {
       cancelled = true;
     };
-  }, [profile]);
+  }, [profile, reloadKey]);
 
   if (loading) {
     return (
@@ -228,11 +231,9 @@ function AdminDashboard() {
             Quick Actions
           </h2>
           <div className="flex flex-wrap gap-3">
-            <Button asChild>
-              <Link to="/admin">
-                <UserPlus className="h-4 w-4" />
-                Add Student
-              </Link>
+            <Button onClick={() => setAddOpen(true)}>
+              <UserPlus className="h-4 w-4" />
+              Add Student
             </Button>
             <Button variant="outline" asChild>
               <Link to="/admin">
@@ -247,9 +248,6 @@ function AdminDashboard() {
               </Link>
             </Button>
           </div>
-          <p className="mt-2 text-xs text-muted-foreground">
-            Add Student form and full student list will be wired up in the next milestone.
-          </p>
         </section>
 
         {/* Recent students */}
@@ -308,6 +306,12 @@ function AdminDashboard() {
           </Card>
         </section>
       </main>
+
+      <AddStudentDialog
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        onCreated={() => setReloadKey((k) => k + 1)}
+      />
     </div>
   );
 }
