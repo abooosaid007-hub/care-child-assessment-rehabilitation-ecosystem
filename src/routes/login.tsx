@@ -27,6 +27,8 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
 
   // If a session+profile already exists, redirect to that role's dashboard
   useEffect(() => {
