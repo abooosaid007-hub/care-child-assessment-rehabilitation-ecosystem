@@ -49,7 +49,7 @@ const COMORBID_OPTIONS = [
 
 const GENDERS = ["Male", "Female", "Other"];
 const SEVERITIES = ["Mild", "Moderate", "Severe"];
-const COMPLEXITY = ["Low", "Medium", "High"];
+const COMPLEXITY = ["Simple", "Moderate", "Complex"];
 
 const schema = z.object({
   first_name: z.string().trim().min(1, "First name is required").max(100),
