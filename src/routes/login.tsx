@@ -190,7 +190,16 @@ function LoginPage() {
                 </div>
               )}
 
-              {profileError && user && (
+              {successMsg && (
+                <div
+                  role="status"
+                  className="rounded-md border border-green-500/30 bg-green-500/10 px-3 py-2 text-sm text-green-700"
+                >
+                  {successMsg}
+                </div>
+              )}
+
+              {profileError && user && mode === "signin" && (
                 <div
                   role="alert"
                   className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
@@ -204,8 +213,30 @@ function LoginPage() {
                 disabled={submitting}
                 className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-11 text-base font-medium"
               >
-                {submitting ? t("Signing in…", "سائن ان…") : t("Sign in", "سائن ان")}
+                {submitting
+                  ? mode === "signup"
+                    ? t("Creating account…", "اکاؤنٹ بن رہا ہے…")
+                    : t("Signing in…", "سائن ان…")
+                  : mode === "signup"
+                    ? t("Create account", "اکاؤنٹ بنائیں")
+                    : t("Sign in", "سائن ان")}
               </Button>
+
+              <div className="text-center pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setErrorMsg(null);
+                    setSuccessMsg(null);
+                    setMode(mode === "signin" ? "signup" : "signin");
+                  }}
+                  className="text-sm text-primary hover:underline"
+                >
+                  {mode === "signin"
+                    ? t("First time setup? Create account", "پہلی بار سیٹ اپ؟ اکاؤنٹ بنائیں")
+                    : t("Already have an account? Sign in", "پہلے سے اکاؤنٹ ہے؟ سائن ان کریں")}
+                </button>
+              </div>
             </form>
           </div>
 
