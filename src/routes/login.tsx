@@ -40,7 +40,51 @@ function LoginPage() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
+    setSuccessMsg(null);
     setSubmitting(true);
+
+    if (mode === "signup") {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: `${window.location.origin}/` },
+      });
+      if (error) {
+        setSubmitting(false);
+        setErrorMsg(error.message);
+        return;
+      }
+      const newUserId = data.user?.id;
+      if (newUserId) {
+        // Upsert profile as administrator (overrides default 'teacher' from trigger)
+        const { error: pErr } = await supabase.from("profiles").upsert({
+          id: newUserId,
+          email,
+          full_name: "",
+          role: "administrator",
+          active: true,
+        });
+        if (pErr) {
+          setSubmitting(false);
+          setErrorMsg(`Account created but profile setup failed: ${pErr.message}`);
+          return;
+        }
+      }
+      setSubmitting(false);
+      if (!data.session) {
+        setSuccessMsg(
+          t(
+            "Account created. Check your email to confirm, then sign in.",
+            "اکاؤنٹ بن گیا۔ ای میل کی تصدیق کریں، پھر سائن ان کریں۔"
+          )
+        );
+        setMode("signin");
+        return;
+      }
+      // Session exists — auth listener will load profile and redirect.
+      return;
+    }
+
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setSubmitting(false);
     if (error) {
