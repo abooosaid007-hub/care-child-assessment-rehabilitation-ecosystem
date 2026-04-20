@@ -306,6 +306,12 @@ function AdminDashboard() {
           </Card>
         </section>
       </main>
+
+      <AddStudentDialog
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        onCreated={() => setReloadKey((k) => k + 1)}
+      />
     </div>
   );
 }
