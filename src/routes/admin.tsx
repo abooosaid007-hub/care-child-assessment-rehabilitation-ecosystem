@@ -231,11 +231,9 @@ function AdminDashboard() {
             Quick Actions
           </h2>
           <div className="flex flex-wrap gap-3">
-            <Button asChild>
-              <Link to="/admin">
-                <UserPlus className="h-4 w-4" />
-                Add Student
-              </Link>
+            <Button onClick={() => setAddOpen(true)}>
+              <UserPlus className="h-4 w-4" />
+              Add Student
             </Button>
             <Button variant="outline" asChild>
               <Link to="/admin">
@@ -250,9 +248,6 @@ function AdminDashboard() {
               </Link>
             </Button>
           </div>
-          <p className="mt-2 text-xs text-muted-foreground">
-            Add Student form and full student list will be wired up in the next milestone.
-          </p>
         </section>
 
         {/* Recent students */}
