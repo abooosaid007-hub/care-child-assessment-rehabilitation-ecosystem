@@ -50,6 +50,8 @@ function AdminDashboard() {
   const [recent, setRecent] = useState<StudentRow[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [dataError, setDataError] = useState<string | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     if (loading) return;
