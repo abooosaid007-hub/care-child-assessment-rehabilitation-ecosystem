@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Users, ClipboardCheck, AlertTriangle, FileText, UserPlus, Eye } from "lucide-react";
+import { AddStudentDialog } from "@/components/AddStudentDialog";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
