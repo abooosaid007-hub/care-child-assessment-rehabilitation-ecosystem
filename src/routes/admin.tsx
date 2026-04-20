@@ -125,7 +125,7 @@ function AdminDashboard() {
     return () => {
       cancelled = true;
     };
-  }, [profile]);
+  }, [profile, reloadKey]);
 
   if (loading) {
     return (
