@@ -388,7 +388,8 @@ function AssessmentPage() {
           .insert({
             student_id: studentId,
             created_by: user.id,
-            form_data: initial as unknown as Record<string, unknown>,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            form_data: initial as any,
             assessment_date: initial.assessment_date,
             assessment_type: initial.assessment_type,
             consultant_name: initial.consultant_name,
@@ -428,7 +429,8 @@ function AssessmentPage() {
     const { error } = await supabase
       .from("assessments")
       .update({
-        form_data: f as unknown as Record<string, unknown>,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        form_data: f as any,
         assessment_date: f.assessment_date,
         assessment_type: f.assessment_type,
         consultant_name: f.consultant_name,
