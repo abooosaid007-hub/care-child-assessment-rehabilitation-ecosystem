@@ -280,7 +280,11 @@ function AdminDashboard() {
                   </TableHeader>
                   <TableBody>
                     {recent.map((s) => (
-                      <TableRow key={s.id}>
+                      <TableRow
+                        key={s.id}
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => navigate({ to: "/students/$studentId", params: { studentId: s.id } })}
+                      >
                         <TableCell className="font-mono text-xs">{s.student_code}</TableCell>
                         <TableCell className="font-medium">{s.first_name}</TableCell>
                         <TableCell>{s.primary_condition}</TableCell>
@@ -292,9 +296,11 @@ function AdminDashboard() {
                           <StatusPill text={s.status} />
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="sm" disabled>
-                            <Eye className="h-4 w-4" />
-                            View
+                          <Button variant="ghost" size="sm" asChild onClick={(e) => e.stopPropagation()}>
+                            <Link to="/students/$studentId" params={{ studentId: s.id }}>
+                              <Eye className="h-4 w-4" />
+                              View
+                            </Link>
                           </Button>
                         </TableCell>
                       </TableRow>
