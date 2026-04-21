@@ -460,6 +460,61 @@ function AssessmentPage() {
     setForm((f) => ({ ...f, [key]: value }));
   };
 
+  const submitAssessment = async () => {
+    setSubmitError(null);
+    // Validate required fields across critical sections
+    const missing: string[] = [];
+    if (!form.assessment_type) missing.push("assessment type (Section 1)");
+    if (!form.consultant_name.trim()) missing.push("consultant name (Section 1)");
+    if (!form.assessment_date) missing.push("assessment date (Section 1)");
+    if (!form.clinical_impression.trim()) missing.push("clinical impression (Section 9)");
+    if (!form.recommended_next_step) missing.push("recommended next step (Section 9)");
+    if (missing.length) {
+      setSubmitError(`Please complete: ${missing.join(", ")}.`);
+      return;
+    }
+
+    const id = assessmentIdRef.current;
+    if (!id) {
+      setSubmitError("No assessment draft found. Please reload the page.");
+      return;
+    }
+
+    setSubmitting(true);
+    const f = formRef.current;
+    const { error } = await supabase
+      .from("assessments")
+      .update({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        form_data: f as any,
+        assessment_date: f.assessment_date,
+        assessment_type: f.assessment_type,
+        consultant_name: f.consultant_name,
+        psychologist_status: "Submitted",
+      })
+      .eq("id", id);
+
+    if (error) {
+      setSubmitting(false);
+      setSubmitError(`Submit failed: ${error.message}`);
+      return;
+    }
+
+    const { error: stuErr } = await supabase
+      .from("students")
+      .update({ assessment_status: "Intake Submitted" })
+      .eq("id", studentId);
+
+    setSubmitting(false);
+    if (stuErr) {
+      setSubmitError(`Saved assessment but failed to update student status: ${stuErr.message}`);
+      return;
+    }
+    setLastSaved(new Date());
+    setSubmitted(true);
+    toast.success("Assessment submitted successfully");
+  };
+
   const generateAI = async () => {
     // Validate sections 1 and 9
     if (!form.assessment_type || !form.consultant_name || !form.assessment_date) {
