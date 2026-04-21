@@ -834,7 +834,42 @@ function AssessmentPage() {
               <div><Label>Recommended Next Step</Label><div className="mt-2"><ButtonSelector options={NEXT_STEP} value={form.recommended_next_step} onChange={(v) => update("recommended_next_step", v)} /></div></div>
               <div><Label>Clinical Questions for Psychologist</Label><Textarea rows={3} value={form.clinical_questions} onChange={(e) => update("clinical_questions", e.target.value)} /></div>
 
-              <div className="pt-4 border-t border-border">
+              <div className="pt-4 border-t border-border space-y-3">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="w-full"
+                  onClick={submitAssessment}
+                  disabled={submitting}
+                >
+                  <Save className="h-5 w-5" />
+                  {submitting ? "Submitting…" : "Submit Assessment (Sections 1–9)"}
+                </Button>
+                {submitError && (
+                  <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive break-words">
+                    {submitError}
+                  </div>
+                )}
+                {submitted && (
+                  <div className="rounded-md border-2 border-green-500 bg-green-50 p-4 space-y-3">
+                    <p className="font-semibold text-green-800">
+                      ✓ Assessment submitted successfully — all 9 sections saved.
+                    </p>
+                    <p className="text-sm text-green-700">
+                      You can now generate the AI assessment report below, or return to the student profile.
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      <Button asChild variant="outline" size="sm">
+                        <Link to="/students/$studentId" params={{ studentId }}>
+                          <ArrowLeft className="h-4 w-4" /> Back to Student Profile
+                        </Link>
+                      </Button>
+                      <Button asChild variant="outline" size="sm">
+                        <Link to="/admin">Go to Dashboard</Link>
+                      </Button>
+                    </div>
+                  </div>
+                )}
                 <Button
                   size="lg"
                   className="bg-teal-600 hover:bg-teal-700 text-white w-full"
@@ -845,7 +880,7 @@ function AssessmentPage() {
                   {aiLoading ? "AI is analyzing assessment data, please wait…" : "Generate AI Assessment Report"}
                 </Button>
                 {aiError && (
-                  <div className="mt-3 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive break-words">
+                  <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive break-words">
                     {aiError}
                   </div>
                 )}
