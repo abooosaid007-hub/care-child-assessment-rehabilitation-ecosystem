@@ -318,6 +318,9 @@ function AssessmentPage() {
   const [aiOutput, setAiOutput] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
 
   const formRef = useRef(form);
   formRef.current = form;
