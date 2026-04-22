@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, ClipboardList } from "lucide-react";
+import { AssessmentOverlay } from "@/components/AssessmentOverlay";
 
 export const Route = createFileRoute("/students/$studentId")({
   head: () => ({ meta: [{ title: "Student Profile — CARE" }] }),
