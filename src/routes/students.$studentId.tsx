@@ -279,6 +279,10 @@ function StudentProfilePage() {
           </CardContent>
         </Card>
       </main>
+
+      {assessmentOpen && (
+        <AssessmentOverlay student={student} onClose={() => setAssessmentOpen(false)} />
+      )}
     </div>
   );
 }
