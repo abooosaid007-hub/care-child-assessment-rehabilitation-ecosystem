@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, ClipboardList } from "lucide-react";
+import { AssessmentOverlay } from "@/components/AssessmentOverlay";
 
 export const Route = createFileRoute("/students/$studentId")({
   head: () => ({ meta: [{ title: "Student Profile — CARE" }] }),
@@ -59,6 +60,7 @@ function StudentProfilePage() {
   const [student, setStudent] = useState<Student | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [assessmentOpen, setAssessmentOpen] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -247,11 +249,9 @@ function StudentProfilePage() {
             <Button
               size="lg"
               className="bg-teal-600 hover:bg-teal-700 text-white"
-              asChild
+              onClick={() => setAssessmentOpen(true)}
             >
-              <Link to="/students/$studentId/assess" params={{ studentId: student.id }}>
-                <ClipboardList className="h-5 w-5" /> Start Assessment
-              </Link>
+              <ClipboardList className="h-5 w-5" /> Start Assessment
             </Button>
           </CardContent>
         </Card>
@@ -279,6 +279,10 @@ function StudentProfilePage() {
           </CardContent>
         </Card>
       </main>
+
+      {assessmentOpen && (
+        <AssessmentOverlay student={student} onClose={() => setAssessmentOpen(false)} />
+      )}
     </div>
   );
 }
