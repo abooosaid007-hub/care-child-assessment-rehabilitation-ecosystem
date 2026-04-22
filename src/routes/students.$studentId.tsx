@@ -249,11 +249,9 @@ function StudentProfilePage() {
             <Button
               size="lg"
               className="bg-teal-600 hover:bg-teal-700 text-white"
-              asChild
+              onClick={() => setAssessmentOpen(true)}
             >
-              <Link to="/students/$studentId/assess" params={{ studentId: student.id }}>
-                <ClipboardList className="h-5 w-5" /> Start Assessment
-              </Link>
+              <ClipboardList className="h-5 w-5" /> Start Assessment
             </Button>
           </CardContent>
         </Card>
