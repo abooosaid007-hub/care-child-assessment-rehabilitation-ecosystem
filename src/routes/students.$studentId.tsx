@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, ClipboardList, NotebookPen } from "lucide-react";
+import { ArrowLeft, ClipboardList, NotebookPen, FileText } from "lucide-react";
 import { AssessmentOverlay } from "@/components/AssessmentOverlay";
 import { DailyLogOverlay } from "@/components/DailyLogOverlay";
 
@@ -262,6 +262,11 @@ function StudentProfilePage() {
                 onClick={() => setLogOpen(true)}
               >
                 <NotebookPen className="h-5 w-5" /> Log Daily Observation
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <Link to="/students/$studentId/plans" params={{ studentId: student.id }}>
+                  <FileText className="h-5 w-5" /> View Intervention Plans
+                </Link>
               </Button>
             </div>
           </CardContent>
