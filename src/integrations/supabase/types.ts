@@ -155,6 +155,57 @@ export type Database = {
           },
         ]
       }
+      intervention_plans: {
+        Row: {
+          assessment_id: string
+          content: string
+          created_at: string
+          created_by: string | null
+          generated_at: string
+          id: string
+          plan_type: string
+          student_id: string
+          title: string
+        }
+        Insert: {
+          assessment_id: string
+          content: string
+          created_at?: string
+          created_by?: string | null
+          generated_at?: string
+          id?: string
+          plan_type: string
+          student_id: string
+          title: string
+        }
+        Update: {
+          assessment_id?: string
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          generated_at?: string
+          id?: string
+          plan_type?: string
+          student_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "intervention_plans_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "intervention_plans_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           active: boolean
