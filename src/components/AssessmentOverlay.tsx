@@ -10,8 +10,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, Save, Sparkles, Send, X } from "lucide-react";
+import { ArrowLeft, Save, Sparkles, Send, X, ClipboardCheck } from "lucide-react";
 import { toast } from "sonner";
+import { PsychologistReviewOverlay } from "@/components/PsychologistReviewOverlay";
 
 interface StudentLite {
   id: string;
