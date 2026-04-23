@@ -285,6 +285,8 @@ export function AssessmentOverlay({ student, onClose }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [psychNotes, setPsychNotes] = useState<string | null>(null);
 
   const formRef = useRef(form);
   formRef.current = form;
