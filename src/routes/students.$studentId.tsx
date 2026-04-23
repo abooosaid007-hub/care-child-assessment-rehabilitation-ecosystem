@@ -294,6 +294,14 @@ function StudentProfilePage() {
       {assessmentOpen && (
         <AssessmentOverlay student={student} onClose={() => setAssessmentOpen(false)} />
       )}
+
+      {logOpen && (
+        <DailyLogOverlay
+          studentId={student.id}
+          studentName={student.first_name}
+          onClose={() => setLogOpen(false)}
+        />
+      )}
     </div>
   );
 }
