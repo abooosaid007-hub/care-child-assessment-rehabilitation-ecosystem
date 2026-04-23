@@ -312,7 +312,7 @@ export function AssessmentOverlay({ student, onClose }: Props) {
 
       const { data: existing, error: aErr } = await supabase
         .from("assessments")
-        .select("id, form_data, ai_draft_output")
+        .select("id, form_data, ai_draft_output, psychologist_notes")
         .eq("student_id", studentId)
         .eq("psychologist_status", "Pending")
         .order("created_at", { ascending: false })
@@ -332,6 +332,7 @@ export function AssessmentOverlay({ student, onClose }: Props) {
           setForm({ ...emptyForm(), ...(existing.form_data as Partial<FormData>) });
         }
         if (existing.ai_draft_output) setAiOutput(existing.ai_draft_output);
+        if (existing.psychologist_notes) setPsychNotes(existing.psychologist_notes);
       } else {
         const initial = emptyForm();
         if (profile?.full_name) initial.consultant_name = profile.full_name;
