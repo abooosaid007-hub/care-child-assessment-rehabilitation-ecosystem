@@ -831,6 +831,21 @@ export function AssessmentOverlay({ student, onClose }: Props) {
           </div>
         </main>
       )}
+
+      {reviewOpen && aiOutput && assessmentId && (
+        <PsychologistReviewOverlay
+          assessmentId={assessmentId}
+          studentId={studentId}
+          studentName={student.first_name}
+          aiDraftOutput={aiOutput}
+          initialPsychologistNotes={psychNotes}
+          onClose={() => setReviewOpen(false)}
+          onApproved={() => {
+            // Close the assessment overlay too once approved
+            onClose();
+          }}
+        />
+      )}
     </div>
   );
 }
