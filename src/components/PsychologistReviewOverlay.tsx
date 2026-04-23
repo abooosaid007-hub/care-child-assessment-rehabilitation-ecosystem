@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
@@ -30,7 +31,42 @@ export function PsychologistReviewOverlay({
   onApproved,
 }: Props) {
   const { profile } = useAuth();
+  const navigate = useNavigate();
   const canSeeNotes = profile?.role === "psychologist" || profile?.role === "administrator";
+
+  const generateAndSavePlans = async (finalDraft: string) => {
+    toast.loading("Generating intervention plans…", { id: "plans-gen" });
+    const { data, error } = await supabase.functions.invoke("generate-plans", {
+      body: {
+        studentSummary: { id: studentId, name: studentName },
+        approvedAssessment: finalDraft,
+      },
+    });
+    if (error || !data?.plans) {
+      toast.error(`Plan generation failed: ${error?.message ?? data?.error ?? "Unknown error"}`, {
+        id: "plans-gen",
+      });
+      return false;
+    }
+    const rows = (data.plans as Array<{ plan_type: string; title: string; content: string }>).map(
+      (p) => ({
+        student_id: studentId,
+        assessment_id: assessmentId,
+        plan_type: p.plan_type,
+        title: p.title,
+        content: p.content,
+        created_by: profile?.id ?? null,
+      }),
+    );
+    const { error: insErr } = await supabase.from("intervention_plans").insert(rows);
+    if (insErr) {
+      toast.error(`Saving plans failed: ${insErr.message}`, { id: "plans-gen" });
+      return false;
+    }
+    toast.success("Intervention plans generated", { id: "plans-gen" });
+    navigate({ to: "/students/$studentId/plans", params: { studentId } });
+    return true;
+  };
 
   const [mode, setMode] = useState<Mode>("menu");
   const [working, setWorking] = useState(false);
@@ -114,6 +150,7 @@ export function PsychologistReviewOverlay({
       return;
     }
     toast.success("Profile confirmed and approved");
+    await generateAndSavePlans(aiDraftOutput);
     onApproved?.();
     onClose();
   };
@@ -150,6 +187,7 @@ export function PsychologistReviewOverlay({
       return;
     }
     toast.success("Modified profile approved");
+    await generateAndSavePlans(editedDraft);
     onApproved?.();
     onClose();
   };
