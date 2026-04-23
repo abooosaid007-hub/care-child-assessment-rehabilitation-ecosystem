@@ -30,7 +30,7 @@ const REG_LEVELS = [
   { v: 4, label: "Good" },
   { v: 5, label: "Excellent" },
 ];
-const PROMPT_DEPS = ["Independent", "Verbal Prompt", "Physical Prompt", "Full Assist"];
+const PROMPT_DEPS = ["Independent", "Verbal", "Physical", "Full Assist"];
 const SKILL_PERF = ["Emerging", "Developing", "Consistent"];
 
 function PillButton({
