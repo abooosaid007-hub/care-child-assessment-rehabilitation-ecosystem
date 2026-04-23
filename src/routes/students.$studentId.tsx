@@ -248,13 +248,22 @@ function StudentProfilePage() {
             <p className="text-sm text-muted-foreground">
               Complete the 9-section intake form to generate AI assessment.
             </p>
-            <Button
-              size="lg"
-              className="bg-teal-600 hover:bg-teal-700 text-white"
-              onClick={() => setAssessmentOpen(true)}
-            >
-              <ClipboardList className="h-5 w-5" /> Start Assessment
-            </Button>
+            <div className="flex flex-wrap gap-3">
+              <Button
+                size="lg"
+                className="bg-teal-600 hover:bg-teal-700 text-white"
+                onClick={() => setAssessmentOpen(true)}
+              >
+                <ClipboardList className="h-5 w-5" /> Start Assessment
+              </Button>
+              <Button
+                size="lg"
+                className="bg-teal-400 hover:bg-teal-500 text-white"
+                onClick={() => setLogOpen(true)}
+              >
+                <NotebookPen className="h-5 w-5" /> Log Daily Observation
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
