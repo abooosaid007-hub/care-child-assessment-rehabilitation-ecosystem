@@ -10,8 +10,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, Save, Sparkles, Send, X } from "lucide-react";
+import { ArrowLeft, Save, Sparkles, Send, X, ClipboardCheck } from "lucide-react";
 import { toast } from "sonner";
+import { PsychologistReviewOverlay } from "@/components/PsychologistReviewOverlay";
 
 interface StudentLite {
   id: string;
@@ -284,6 +285,8 @@ export function AssessmentOverlay({ student, onClose }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [psychNotes, setPsychNotes] = useState<string | null>(null);
 
   const formRef = useRef(form);
   formRef.current = form;
@@ -309,7 +312,7 @@ export function AssessmentOverlay({ student, onClose }: Props) {
 
       const { data: existing, error: aErr } = await supabase
         .from("assessments")
-        .select("id, form_data, ai_draft_output")
+        .select("id, form_data, ai_draft_output, psychologist_notes")
         .eq("student_id", studentId)
         .eq("psychologist_status", "Pending")
         .order("created_at", { ascending: false })
@@ -329,6 +332,7 @@ export function AssessmentOverlay({ student, onClose }: Props) {
           setForm({ ...emptyForm(), ...(existing.form_data as Partial<FormData>) });
         }
         if (existing.ai_draft_output) setAiOutput(existing.ai_draft_output);
+        if (existing.psychologist_notes) setPsychNotes(existing.psychologist_notes);
       } else {
         const initial = emptyForm();
         if (profile?.full_name) initial.consultant_name = profile.full_name;
@@ -805,9 +809,14 @@ export function AssessmentOverlay({ student, onClose }: Props) {
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
                 <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed">{aiOutput}</pre>
-                <Button onClick={sendToPsychologist} className="bg-teal-600 hover:bg-teal-700 text-white">
-                  <Send className="h-4 w-4" /> Send to Psychologist for Review
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button onClick={sendToPsychologist} className="bg-teal-600 hover:bg-teal-700 text-white">
+                    <Send className="h-4 w-4" /> Send to Psychologist for Review
+                  </Button>
+                  <Button onClick={() => setReviewOpen(true)} className="bg-indigo-600 hover:bg-indigo-700 text-white">
+                    <ClipboardCheck className="h-4 w-4" /> Review
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           )}
@@ -821,6 +830,21 @@ export function AssessmentOverlay({ student, onClose }: Props) {
             </Button>
           </div>
         </main>
+      )}
+
+      {reviewOpen && aiOutput && assessmentId && (
+        <PsychologistReviewOverlay
+          assessmentId={assessmentId}
+          studentId={studentId}
+          studentName={student.first_name}
+          aiDraftOutput={aiOutput}
+          initialPsychologistNotes={psychNotes}
+          onClose={() => setReviewOpen(false)}
+          onApproved={() => {
+            // Close the assessment overlay too once approved
+            onClose();
+          }}
+        />
       )}
     </div>
   );

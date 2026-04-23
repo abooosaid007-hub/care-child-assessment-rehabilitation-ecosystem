@@ -4,8 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, ClipboardList } from "lucide-react";
+import { ArrowLeft, ClipboardList, NotebookPen } from "lucide-react";
 import { AssessmentOverlay } from "@/components/AssessmentOverlay";
+import { DailyLogOverlay } from "@/components/DailyLogOverlay";
 
 export const Route = createFileRoute("/students/$studentId")({
   head: () => ({ meta: [{ title: "Student Profile — CARE" }] }),
@@ -61,6 +62,7 @@ function StudentProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [assessmentOpen, setAssessmentOpen] = useState(false);
+  const [logOpen, setLogOpen] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -246,13 +248,22 @@ function StudentProfilePage() {
             <p className="text-sm text-muted-foreground">
               Complete the 9-section intake form to generate AI assessment.
             </p>
-            <Button
-              size="lg"
-              className="bg-teal-600 hover:bg-teal-700 text-white"
-              onClick={() => setAssessmentOpen(true)}
-            >
-              <ClipboardList className="h-5 w-5" /> Start Assessment
-            </Button>
+            <div className="flex flex-wrap gap-3">
+              <Button
+                size="lg"
+                className="bg-teal-600 hover:bg-teal-700 text-white"
+                onClick={() => setAssessmentOpen(true)}
+              >
+                <ClipboardList className="h-5 w-5" /> Start Assessment
+              </Button>
+              <Button
+                size="lg"
+                className="bg-teal-400 hover:bg-teal-500 text-white"
+                onClick={() => setLogOpen(true)}
+              >
+                <NotebookPen className="h-5 w-5" /> Log Daily Observation
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
@@ -282,6 +293,14 @@ function StudentProfilePage() {
 
       {assessmentOpen && (
         <AssessmentOverlay student={student} onClose={() => setAssessmentOpen(false)} />
+      )}
+
+      {logOpen && (
+        <DailyLogOverlay
+          studentId={student.id}
+          studentName={student.first_name}
+          onClose={() => setLogOpen(false)}
+        />
       )}
     </div>
   );
