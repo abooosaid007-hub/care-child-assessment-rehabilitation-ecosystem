@@ -809,9 +809,14 @@ export function AssessmentOverlay({ student, onClose }: Props) {
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
                 <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed">{aiOutput}</pre>
-                <Button onClick={sendToPsychologist} className="bg-teal-600 hover:bg-teal-700 text-white">
-                  <Send className="h-4 w-4" /> Send to Psychologist for Review
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button onClick={sendToPsychologist} className="bg-teal-600 hover:bg-teal-700 text-white">
+                    <Send className="h-4 w-4" /> Send to Psychologist for Review
+                  </Button>
+                  <Button onClick={() => setReviewOpen(true)} className="bg-indigo-600 hover:bg-indigo-700 text-white">
+                    <ClipboardCheck className="h-4 w-4" /> Review
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           )}
