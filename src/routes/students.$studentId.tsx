@@ -62,6 +62,7 @@ function StudentProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [assessmentOpen, setAssessmentOpen] = useState(false);
+  const [logOpen, setLogOpen] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
