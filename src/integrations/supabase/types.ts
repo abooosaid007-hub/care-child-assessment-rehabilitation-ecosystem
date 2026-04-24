@@ -173,6 +173,47 @@ export type Database = {
           },
         ]
       }
+      domain_progress_scores: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          notes: string | null
+          period_month: string
+          priority_domain: string
+          score: number
+          student_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          period_month: string
+          priority_domain: string
+          score: number
+          student_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          period_month?: string
+          priority_domain?: string
+          score?: number
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "domain_progress_scores_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       intervention_plans: {
         Row: {
           assessment_id: string

@@ -81,6 +81,10 @@ export function DailyLogOverlay({
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [unknownWarning, setUnknownWarning] = useState<{
+    pct: number;
+    total: number;
+  } | null>(null);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -89,6 +93,23 @@ export function DailyLogOverlay({
       document.body.style.overflow = prev;
     };
   }, []);
+
+  // Data quality check: if >40% of last 7 days of logs used "Unknown" trigger, warn.
+  useEffect(() => {
+    (async () => {
+      const since = new Date();
+      since.setDate(since.getDate() - 7);
+      const { data } = await supabase
+        .from("daily_logs")
+        .select("context_trigger")
+        .eq("student_id", studentId)
+        .gte("log_date", since.toISOString().slice(0, 10));
+      if (!data || data.length === 0) return;
+      const unknown = data.filter((r) => r.context_trigger === "Unknown").length;
+      const pct = (unknown / data.length) * 100;
+      if (pct > 40) setUnknownWarning({ pct: Math.round(pct), total: data.length });
+    })();
+  }, [studentId]);
 
   const submit = async () => {
     setError(null);
@@ -158,6 +179,16 @@ export function DailyLogOverlay({
               <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
                 No priority domain selected for this student. Ask the psychologist to select one
                 before logging.
+              </div>
+            )}
+
+            {unknownWarning && (
+              <div className="rounded-md border-2 border-orange-400 bg-orange-50 p-3 text-sm text-orange-900">
+                <p className="font-semibold">⚠ Data quality flag</p>
+                <p>
+                  {unknownWarning.pct}% of the last {unknownWarning.total} logs used "Unknown" as
+                  the trigger. Please pick a specific trigger when possible.
+                </p>
               </div>
             )}
 

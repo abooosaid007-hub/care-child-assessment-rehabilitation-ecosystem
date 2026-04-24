@@ -117,11 +117,24 @@ export function InterventionOptionsOverlay({
     setWorking(true);
     const today = new Date().toISOString().slice(0, 10);
     const strategyName = `Option ${pickedOption}`;
+
+    // Enforce single active strategy: supersede any existing active plans for this student.
+    const { error: supErr } = await supabase
+      .from("intervention_plans")
+      .update({ status: "Superseded" })
+      .eq("student_id", studentId)
+      .eq("status", "Active");
+    if (supErr) {
+      setWorking(false);
+      setError(`Could not retire previous active strategy: ${supErr.message}`);
+      return;
+    }
+
     const { error: insErr } = await supabase.from("intervention_plans").insert({
       student_id: studentId,
       assessment_id: assessment.id,
-      plan_type: "domain_strategy",
-      title: `${priorityDomain} — ${strategyName}`,
+      plan_type: "active_strategy",
+      title: `${priorityDomain} — ${strategyName} (Active)`,
       content: output ?? "",
       priority_domain: priorityDomain,
       selected_strategy: strategyName,
