@@ -288,11 +288,22 @@ function StudentProfilePage() {
               </Button>
               <Button
                 size="lg"
-                className="bg-teal-400 hover:bg-teal-500 text-white"
+                className="bg-teal-400 hover:bg-teal-500 text-white disabled:opacity-50"
                 onClick={() => setLogOpen(true)}
+                disabled={!student.priority_domain}
+                title={
+                  !student.priority_domain
+                    ? "Priority Domain required before logging"
+                    : undefined
+                }
               >
                 <NotebookPen className="h-5 w-5" /> Log Daily Observation
               </Button>
+              {!student.priority_domain && (
+                <p className="w-full text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
+                  Daily logs and intervention options are locked until a Priority Domain is selected.
+                </p>
+              )}
               {canPickDomain && student.assessment_status === "Diagnosis Confirmed" && !student.priority_domain && (
                 <Button
                   size="lg"
