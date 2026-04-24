@@ -4,9 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, ClipboardList, NotebookPen, FileText } from "lucide-react";
+import { ArrowLeft, ClipboardList, NotebookPen, FileText, Sparkles, Target } from "lucide-react";
 import { AssessmentOverlay } from "@/components/AssessmentOverlay";
 import { DailyLogOverlay } from "@/components/DailyLogOverlay";
+import { PriorityDomainOverlay } from "@/components/PriorityDomainOverlay";
+import { InterventionOptionsOverlay } from "@/components/InterventionOptionsOverlay";
 
 export const Route = createFileRoute("/students/$studentId")({
   head: () => ({ meta: [{ title: "Student Profile — CARE" }] }),
@@ -29,6 +31,9 @@ interface Student {
   status: string;
   assessment_status: string;
   enrollment_date: string | null;
+  priority_domain: string | null;
+  priority_domain_start_date: string | null;
+  intervention_status: string | null;
 }
 
 function calcAge(dob: string): string {
@@ -54,6 +59,9 @@ function complexityClasses(flag: string | null): string {
   }
 }
 
+const STUDENT_COLS =
+  "id, student_code, first_name, date_of_birth, gender, class_section, primary_condition, comorbid_conditions, under_observation, observation_notes, severity, complexity_flag, status, assessment_status, enrollment_date, priority_domain, priority_domain_start_date, intervention_status";
+
 function StudentProfilePage() {
   const { studentId } = Route.useParams();
   const navigate = useNavigate();
@@ -63,6 +71,8 @@ function StudentProfilePage() {
   const [error, setError] = useState<string | null>(null);
   const [assessmentOpen, setAssessmentOpen] = useState(false);
   const [logOpen, setLogOpen] = useState(false);
+  const [priorityOpen, setPriorityOpen] = useState(false);
+  const [optionsOpen, setOptionsOpen] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -72,6 +82,15 @@ function StudentProfilePage() {
     }
   }, [authLoading, user, navigate]);
 
+  const refetchStudent = async () => {
+    const { data } = await supabase
+      .from("students")
+      .select(STUDENT_COLS)
+      .eq("id", studentId)
+      .maybeSingle();
+    if (data) setStudent(data as Student);
+  };
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -79,9 +98,7 @@ function StudentProfilePage() {
       setError(null);
       const { data, error } = await supabase
         .from("students")
-        .select(
-          "id, student_code, first_name, date_of_birth, gender, class_section, primary_condition, comorbid_conditions, under_observation, observation_notes, severity, complexity_flag, status, assessment_status, enrollment_date",
-        )
+        .select(STUDENT_COLS)
         .eq("id", studentId)
         .maybeSingle();
       if (cancelled) return;
@@ -100,6 +117,7 @@ function StudentProfilePage() {
   }, [studentId]);
 
   const canSeeNotes = profile?.role === "administrator" || profile?.role === "psychologist";
+  const canPickDomain = profile?.role === "psychologist" || profile?.role === "administrator";
 
   if (loading) {
     return (
@@ -166,8 +184,23 @@ function StudentProfilePage() {
                 <span className="inline-flex items-center rounded-full bg-secondary text-secondary-foreground px-3 py-1 text-xs font-semibold">
                   {student.assessment_status}
                 </span>
+                {student.priority_domain && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-purple-600 text-white px-3 py-1 text-xs font-semibold">
+                    <Target className="h-3 w-3" /> Priority: {student.priority_domain}
+                  </span>
+                )}
+                {student.intervention_status && (
+                  <span className="inline-flex items-center rounded-full bg-blue-600 text-white px-3 py-1 text-xs font-semibold">
+                    {student.intervention_status}
+                  </span>
+                )}
               </div>
             </div>
+            {student.priority_domain && student.priority_domain_start_date && (
+              <p className="mt-3 text-xs text-muted-foreground">
+                Priority cycle started {student.priority_domain_start_date}
+              </p>
+            )}
           </CardContent>
         </Card>
 
@@ -239,15 +272,12 @@ function StudentProfilePage() {
           </CardContent>
         </Card>
 
-        {/* Section 3 — Clinical Assessment */}
+        {/* Section 3 — Clinical Workflow */}
         <Card>
           <CardHeader>
-            <CardTitle>Clinical Assessment</CardTitle>
+            <CardTitle>Clinical Workflow</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Complete the 9-section intake form to generate AI assessment.
-            </p>
             <div className="flex flex-wrap gap-3">
               <Button
                 size="lg"
@@ -263,6 +293,24 @@ function StudentProfilePage() {
               >
                 <NotebookPen className="h-5 w-5" /> Log Daily Observation
               </Button>
+              {canPickDomain && student.assessment_status === "Diagnosis Confirmed" && !student.priority_domain && (
+                <Button
+                  size="lg"
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                  onClick={() => setPriorityOpen(true)}
+                >
+                  <Target className="h-5 w-5" /> Select Priority Domain
+                </Button>
+              )}
+              {student.priority_domain && (
+                <Button
+                  size="lg"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  onClick={() => setOptionsOpen(true)}
+                >
+                  <Sparkles className="h-5 w-5" /> Generate Intervention Options
+                </Button>
+              )}
               <Button size="lg" variant="outline" asChild>
                 <Link to="/students/$studentId/plans" params={{ studentId: student.id }}>
                   <FileText className="h-5 w-5" /> View Intervention Plans
@@ -297,14 +345,43 @@ function StudentProfilePage() {
       </main>
 
       {assessmentOpen && (
-        <AssessmentOverlay student={student} onClose={() => setAssessmentOpen(false)} />
+        <AssessmentOverlay
+          student={student}
+          onClose={() => setAssessmentOpen(false)}
+          onApproved={async (info) => {
+            await refetchStudent();
+            if (info.triggerPriorityDomain && canPickDomain) {
+              setPriorityOpen(true);
+            }
+          }}
+        />
       )}
 
       {logOpen && (
         <DailyLogOverlay
           studentId={student.id}
           studentName={student.first_name}
+          priorityDomain={student.priority_domain}
           onClose={() => setLogOpen(false)}
+        />
+      )}
+
+      {priorityOpen && (
+        <PriorityDomainOverlay
+          studentId={student.id}
+          studentName={student.first_name}
+          onClose={() => setPriorityOpen(false)}
+          onSelected={() => refetchStudent()}
+        />
+      )}
+
+      {optionsOpen && student.priority_domain && (
+        <InterventionOptionsOverlay
+          studentId={student.id}
+          studentName={student.first_name}
+          priorityDomain={student.priority_domain}
+          onClose={() => setOptionsOpen(false)}
+          onApproved={() => refetchStudent()}
         />
       )}
     </div>

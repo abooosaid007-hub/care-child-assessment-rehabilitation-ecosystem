@@ -266,9 +266,10 @@ function RatingTable({ skills, ratings, onChange }: { skills: string[]; ratings:
 interface Props {
   student: StudentLite;
   onClose: () => void;
+  onApproved?: (info: { triggerPriorityDomain: boolean }) => void;
 }
 
-export function AssessmentOverlay({ student, onClose }: Props) {
+export function AssessmentOverlay({ student, onClose, onApproved }: Props) {
   const studentId = student.id;
   const { profile, user } = useAuth();
 
@@ -840,8 +841,9 @@ export function AssessmentOverlay({ student, onClose }: Props) {
           aiDraftOutput={aiOutput}
           initialPsychologistNotes={psychNotes}
           onClose={() => setReviewOpen(false)}
-          onApproved={() => {
-            // Close the assessment overlay too once approved
+          onApproved={(info) => {
+            setReviewOpen(false);
+            onApproved?.(info);
             onClose();
           }}
         />

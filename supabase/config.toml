@@ -1,1 +1,10 @@
 project_id = "qnsdcinhtwxpzqgetgpw"
+
+[functions.generate-assessment]
+verify_jwt = true
+
+[functions.generate-plans]
+verify_jwt = true
+
+[functions.generate-intervention-options]
+verify_jwt = true

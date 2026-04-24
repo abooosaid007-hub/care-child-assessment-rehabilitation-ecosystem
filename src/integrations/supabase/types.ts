@@ -82,19 +82,25 @@ export type Database = {
           attention_level: number | null
           attention_minutes: number | null
           behavioral_incidents: number
+          context_trigger: string | null
           created_at: string
           created_by: string | null
+          domain: string | null
           emotional_regulation: number | null
           emotional_trigger: string | null
           id: string
           incident_description: string | null
+          incident_yes_no: boolean | null
           intervention_effectiveness: number | null
           intervention_used: string | null
           log_date: string
+          non_compliance_reason: string | null
           prompt_dependency: string | null
+          rating: number | null
           session_time: string | null
           skill_performance: string | null
           skill_practiced: string | null
+          strategy_used: string | null
           student_id: string
           teacher_notes: string | null
         }
@@ -102,19 +108,25 @@ export type Database = {
           attention_level?: number | null
           attention_minutes?: number | null
           behavioral_incidents?: number
+          context_trigger?: string | null
           created_at?: string
           created_by?: string | null
+          domain?: string | null
           emotional_regulation?: number | null
           emotional_trigger?: string | null
           id?: string
           incident_description?: string | null
+          incident_yes_no?: boolean | null
           intervention_effectiveness?: number | null
           intervention_used?: string | null
           log_date?: string
+          non_compliance_reason?: string | null
           prompt_dependency?: string | null
+          rating?: number | null
           session_time?: string | null
           skill_performance?: string | null
           skill_practiced?: string | null
+          strategy_used?: string | null
           student_id: string
           teacher_notes?: string | null
         }
@@ -122,19 +134,25 @@ export type Database = {
           attention_level?: number | null
           attention_minutes?: number | null
           behavioral_incidents?: number
+          context_trigger?: string | null
           created_at?: string
           created_by?: string | null
+          domain?: string | null
           emotional_regulation?: number | null
           emotional_trigger?: string | null
           id?: string
           incident_description?: string | null
+          incident_yes_no?: boolean | null
           intervention_effectiveness?: number | null
           intervention_used?: string | null
           log_date?: string
+          non_compliance_reason?: string | null
           prompt_dependency?: string | null
+          rating?: number | null
           session_time?: string | null
           skill_performance?: string | null
           skill_practiced?: string | null
+          strategy_used?: string | null
           student_id?: string
           teacher_notes?: string | null
         }
@@ -158,36 +176,48 @@ export type Database = {
       intervention_plans: {
         Row: {
           assessment_id: string
-          content: string
+          content: string | null
           created_at: string
           created_by: string | null
           generated_at: string
           id: string
           plan_type: string
+          priority_domain: string | null
+          selected_strategy: string | null
+          start_date: string | null
+          status: string | null
           student_id: string
-          title: string
+          title: string | null
         }
         Insert: {
           assessment_id: string
-          content: string
+          content?: string | null
           created_at?: string
           created_by?: string | null
           generated_at?: string
           id?: string
           plan_type: string
+          priority_domain?: string | null
+          selected_strategy?: string | null
+          start_date?: string | null
+          status?: string | null
           student_id: string
-          title: string
+          title?: string | null
         }
         Update: {
           assessment_id?: string
-          content?: string
+          content?: string | null
           created_at?: string
           created_by?: string | null
           generated_at?: string
           id?: string
           plan_type?: string
+          priority_domain?: string | null
+          selected_strategy?: string | null
+          start_date?: string | null
+          status?: string | null
           student_id?: string
-          title?: string
+          title?: string | null
         }
         Relationships: [
           {
@@ -246,8 +276,11 @@ export type Database = {
           first_name: string
           gender: string | null
           id: string
+          intervention_status: string | null
           observation_notes: string | null
           primary_condition: string
+          priority_domain: string | null
+          priority_domain_start_date: string | null
           severity: string | null
           status: string
           student_code: string
@@ -265,8 +298,11 @@ export type Database = {
           first_name: string
           gender?: string | null
           id?: string
+          intervention_status?: string | null
           observation_notes?: string | null
           primary_condition: string
+          priority_domain?: string | null
+          priority_domain_start_date?: string | null
           severity?: string | null
           status?: string
           student_code?: string
@@ -284,8 +320,11 @@ export type Database = {
           first_name?: string
           gender?: string | null
           id?: string
+          intervention_status?: string | null
           observation_notes?: string | null
           primary_condition?: string
+          priority_domain?: string | null
+          priority_domain_start_date?: string | null
           severity?: string | null
           status?: string
           student_code?: string
