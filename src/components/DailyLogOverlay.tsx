@@ -81,6 +81,10 @@ export function DailyLogOverlay({
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [unknownWarning, setUnknownWarning] = useState<{
+    pct: number;
+    total: number;
+  } | null>(null);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -89,6 +93,23 @@ export function DailyLogOverlay({
       document.body.style.overflow = prev;
     };
   }, []);
+
+  // Data quality check: if >40% of last 7 days of logs used "Unknown" trigger, warn.
+  useEffect(() => {
+    (async () => {
+      const since = new Date();
+      since.setDate(since.getDate() - 7);
+      const { data } = await supabase
+        .from("daily_logs")
+        .select("context_trigger")
+        .eq("student_id", studentId)
+        .gte("log_date", since.toISOString().slice(0, 10));
+      if (!data || data.length === 0) return;
+      const unknown = data.filter((r) => r.context_trigger === "Unknown").length;
+      const pct = (unknown / data.length) * 100;
+      if (pct > 40) setUnknownWarning({ pct: Math.round(pct), total: data.length });
+    })();
+  }, [studentId]);
 
   const submit = async () => {
     setError(null);
