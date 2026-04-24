@@ -182,6 +182,16 @@ export function DailyLogOverlay({
               </div>
             )}
 
+            {unknownWarning && (
+              <div className="rounded-md border-2 border-orange-400 bg-orange-50 p-3 text-sm text-orange-900">
+                <p className="font-semibold">⚠ Data quality flag</p>
+                <p>
+                  {unknownWarning.pct}% of the last {unknownWarning.total} logs used "Unknown" as
+                  the trigger. Please pick a specific trigger when possible.
+                </p>
+              </div>
+            )}
+
             {error && (
               <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive break-words">
                 {error}
