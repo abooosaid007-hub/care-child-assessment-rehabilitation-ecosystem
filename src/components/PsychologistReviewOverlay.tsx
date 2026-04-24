@@ -114,8 +114,7 @@ export function PsychologistReviewOverlay({
       return;
     }
     toast.success("Profile confirmed and approved");
-    await generateAndSavePlans(aiDraftOutput);
-    onApproved?.();
+    onApproved?.({ triggerPriorityDomain: true });
     onClose();
   };
 
@@ -151,8 +150,7 @@ export function PsychologistReviewOverlay({
       return;
     }
     toast.success("Modified profile approved");
-    await generateAndSavePlans(editedDraft);
-    onApproved?.();
+    onApproved?.({ triggerPriorityDomain: true });
     onClose();
   };
 
