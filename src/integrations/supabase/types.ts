@@ -322,9 +322,11 @@ export type Database = {
           primary_condition: string
           priority_domain: string | null
           priority_domain_start_date: string | null
+          school_section: string | null
           severity: string | null
           status: string
           student_code: string
+          sub_category: string | null
           under_observation: string[]
         }
         Insert: {
@@ -344,9 +346,11 @@ export type Database = {
           primary_condition: string
           priority_domain?: string | null
           priority_domain_start_date?: string | null
+          school_section?: string | null
           severity?: string | null
           status?: string
           student_code?: string
+          sub_category?: string | null
           under_observation?: string[]
         }
         Update: {
@@ -366,9 +370,11 @@ export type Database = {
           primary_condition?: string
           priority_domain?: string | null
           priority_domain_start_date?: string | null
+          school_section?: string | null
           severity?: string | null
           status?: string
           student_code?: string
+          sub_category?: string | null
           under_observation?: string[]
         }
         Relationships: [
