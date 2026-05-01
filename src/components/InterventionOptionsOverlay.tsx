@@ -118,10 +118,10 @@ export function InterventionOptionsOverlay({
     const today = new Date().toISOString().slice(0, 10);
     const strategyName = `Option ${pickedOption}`;
 
-    // Enforce single active strategy: supersede any existing active plans for this student.
+    // Enforce single active strategy: archive any existing active plans for this student.
     const { error: supErr } = await supabase
       .from("intervention_plans")
-      .update({ status: "Superseded" })
+      .update({ status: "Archived" })
       .eq("student_id", studentId)
       .eq("status", "Active");
     if (supErr) {
@@ -129,6 +129,12 @@ export function InterventionOptionsOverlay({
       setError(`Could not retire previous active strategy: ${supErr.message}`);
       return;
     }
+    // Archive lingering draft options so non-selected options are never treated as active.
+    await supabase
+      .from("intervention_plans")
+      .update({ status: "Archived" })
+      .eq("student_id", studentId)
+      .in("status", ["Draft", "Deferred"]);
 
     const { error: insErr } = await supabase.from("intervention_plans").insert({
       student_id: studentId,
