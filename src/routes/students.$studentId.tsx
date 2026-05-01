@@ -332,6 +332,14 @@ function StudentProfilePage() {
           </CardContent>
         </Card>
 
+        {/* Intervention Review (14-day cycle + monthly progress score) */}
+        {student.priority_domain && (
+          <InterventionReviewPanel
+            studentId={student.id}
+            priorityDomain={student.priority_domain}
+          />
+        )}
+
         {/* Section 4 — Enrollment */}
         <Card>
           <CardHeader>
