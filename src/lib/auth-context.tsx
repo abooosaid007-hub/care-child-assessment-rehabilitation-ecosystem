@@ -115,18 +115,7 @@ export function useAuth() {
   return ctx;
 }
 
-export function dashboardPathForRole(role: AppRole): string {
-  switch (role) {
-    case "administrator":
-      return "/admin";
-    case "psychologist":
-      return "/psychologist";
-    case "teacher":
-    case "speech_therapist":
-      return "/teacher";
-    case "parent":
-      return "/parent";
-    default:
-      return "/";
-  }
+export function dashboardPathForRole(_role: AppRole): string {
+  // Single shared, role-aware dashboard. Section tabs and filters reflect the role.
+  return "/admin";
 }
