@@ -35,6 +35,8 @@ interface Student {
   priority_domain: string | null;
   priority_domain_start_date: string | null;
   intervention_status: string | null;
+  school_section: string | null;
+  sub_category: string | null;
 }
 
 function calcAge(dob: string): string {
