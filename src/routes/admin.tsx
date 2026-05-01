@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { useAuth, dashboardPathForRole } from "@/lib/auth-context";
+import { useEffect, useMemo, useState } from "react";
+import { useAuth } from "@/lib/auth-context";
 import { CareLogo } from "@/components/CareLogo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,12 +13,29 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Users, ClipboardCheck, AlertTriangle, FileText, UserPlus, Eye } from "lucide-react";
 import { AddStudentDialog } from "@/components/AddStudentDialog";
+import {
+  SCHOOL_SECTIONS,
+  SECTION_LABELS,
+  SECTION_SHORT,
+  ASD_SUBS,
+  MCC_SUBS,
+  CLASS_SUBS,
+  type SchoolSection,
+} from "@/lib/school-sections";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
-    meta: [{ title: "Administrator Dashboard — CARE" }],
+    meta: [{ title: "Dashboard — CARE" }],
   }),
   component: AdminDashboard,
 });
@@ -33,6 +50,10 @@ interface StudentRow {
   status: string;
   complexity_flag: string | null;
   created_at: string;
+  school_section: string | null;
+  sub_category: string | null;
+  intervention_status: string | null;
+  created_by: string | null;
 }
 
 interface Stats {
@@ -42,16 +63,38 @@ interface Stats {
   highComplexity: number;
 }
 
+const STUDENT_COLS =
+  "id, student_code, first_name, primary_condition, class_section, assessment_status, status, complexity_flag, created_at, school_section, sub_category, intervention_status, created_by";
+
+type RoleView = "all" | "mine";
+
 function AdminDashboard() {
   const navigate = useNavigate();
   const { user, profile, profileError, loading, signOut } = useAuth();
 
   const [stats, setStats] = useState<Stats | null>(null);
-  const [recent, setRecent] = useState<StudentRow[]>([]);
+  const [students, setStudents] = useState<StudentRow[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [dataError, setDataError] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
+
+  // Filters (psychologist & admin)
+  const [filterSection, setFilterSection] = useState<string>("__all");
+  const [filterAssessment, setFilterAssessment] = useState<string>("__all");
+  const [filterIntervention, setFilterIntervention] = useState<string>("__all");
+
+  // Active tab
+  const role = profile?.role ?? null;
+  const isAdmin = role === "administrator";
+  const isPsych = role === "psychologist";
+  const isTeacher = role === "teacher" || role === "speech_therapist";
+
+  const [tab, setTab] = useState<string>("all");
+  useEffect(() => {
+    if (isTeacher) setTab("mine");
+    else setTab("all");
+  }, [isTeacher]);
 
   useEffect(() => {
     if (loading) return;
@@ -59,21 +102,17 @@ function AdminDashboard() {
       navigate({ to: "/login" });
       return;
     }
-    if (profile && profile.role !== "administrator") {
-      navigate({ to: dashboardPathForRole(profile.role) });
-    }
-  }, [loading, user, profile, navigate]);
+  }, [loading, user, navigate]);
 
   useEffect(() => {
-    if (!profile || profile.role !== "administrator") return;
+    if (!profile) return;
 
     let cancelled = false;
     (async () => {
       setDataLoading(true);
       setDataError(null);
       try {
-        // Stat counts via head:true count queries
-        const [totalRes, assessedRes, pendingRes, complexRes, recentRes] = await Promise.all([
+        const [totalRes, assessedRes, pendingRes, complexRes, listRes] = await Promise.all([
           supabase.from("students").select("id", { count: "exact", head: true }),
           supabase
             .from("students")
@@ -86,14 +125,11 @@ function AdminDashboard() {
           supabase
             .from("students")
             .select("id", { count: "exact", head: true })
-            .eq("complexity_flag", "High"),
+            .eq("complexity_flag", "Complex"),
           supabase
             .from("students")
-            .select(
-              "id, student_code, first_name, primary_condition, class_section, assessment_status, status, complexity_flag, created_at",
-            )
-            .order("created_at", { ascending: false })
-            .limit(10),
+            .select(STUDENT_COLS)
+            .order("created_at", { ascending: false }),
         ]);
 
         const firstError =
@@ -101,7 +137,7 @@ function AdminDashboard() {
           assessedRes.error ||
           pendingRes.error ||
           complexRes.error ||
-          recentRes.error;
+          listRes.error;
         if (firstError) throw firstError;
 
         if (cancelled) return;
@@ -111,7 +147,7 @@ function AdminDashboard() {
           pending: pendingRes.count ?? 0,
           highComplexity: complexRes.count ?? 0,
         });
-        setRecent((recentRes.data ?? []) as StudentRow[]);
+        setStudents((listRes.data ?? []) as StudentRow[]);
       } catch (e) {
         if (!cancelled) {
           const msg = e instanceof Error ? e.message : "Failed to load dashboard data";
@@ -126,6 +162,25 @@ function AdminDashboard() {
       cancelled = true;
     };
   }, [profile, reloadKey]);
+
+  // Apply top-level filters (psych & admin)
+  const filtered = useMemo(() => {
+    return students.filter((s) => {
+      if (filterSection !== "__all" && s.school_section !== filterSection) return false;
+      if (filterAssessment !== "__all" && s.assessment_status !== filterAssessment) return false;
+      if (filterIntervention !== "__all") {
+        const hasActive = !!s.intervention_status;
+        if (filterIntervention === "Active" && !hasActive) return false;
+        if (filterIntervention === "None" && hasActive) return false;
+      }
+      return true;
+    });
+  }, [students, filterSection, filterAssessment, filterIntervention]);
+
+  const myStudents = useMemo(
+    () => filtered.filter((s) => s.created_by === user?.id),
+    [filtered, user?.id],
+  );
 
   if (loading) {
     return (
@@ -151,7 +206,18 @@ function AdminDashboard() {
     );
   }
 
-  if (!profile || profile.role !== "administrator") return null;
+  if (!profile) return null;
+
+  const roleLabel =
+    role === "administrator"
+      ? "Administrator"
+      : role === "psychologist"
+        ? "Psychologist"
+        : role === "teacher"
+          ? "Teacher"
+          : role === "speech_therapist"
+            ? "Speech Therapist"
+            : "User";
 
   return (
     <div className="min-h-screen bg-background">
@@ -168,7 +234,7 @@ function AdminDashboard() {
           </div>
           <div className="flex items-center gap-3">
             <span className="inline-flex items-center rounded-full bg-accent text-accent-foreground px-3 py-1 text-xs font-medium">
-              Administrator
+              {roleLabel}
             </span>
             <Button onClick={signOut} variant="outline" size="sm">
               Sign out
@@ -180,10 +246,13 @@ function AdminDashboard() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
         <div>
           <h1 className="text-2xl font-heading font-bold text-primary">
-            Welcome, {profile.full_name && profile.full_name.length > 0 ? profile.full_name : profile.email}
+            Welcome,{" "}
+            {profile.full_name && profile.full_name.length > 0
+              ? profile.full_name
+              : profile.email}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Overview of students, assessments, and quick actions.
+            Students grouped by school section. Each child shown with full identity.
           </p>
         </div>
 
@@ -193,123 +262,136 @@ function AdminDashboard() {
           </div>
         )}
 
-        {/* Stat cards */}
-        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard
-            label="Total Students"
-            value={stats?.totalStudents}
-            loading={dataLoading}
-            icon={<Users className="h-5 w-5" />}
-            tone="primary"
-          />
-          <StatCard
-            label="Assessed"
-            value={stats?.assessed}
-            loading={dataLoading}
-            icon={<ClipboardCheck className="h-5 w-5" />}
-            tone="success"
-          />
-          <StatCard
-            label="Pending Assessment"
-            value={stats?.pending}
-            loading={dataLoading}
-            icon={<FileText className="h-5 w-5" />}
-            tone="warning"
-          />
-          <StatCard
-            label="High Complexity"
-            value={stats?.highComplexity}
-            loading={dataLoading}
-            icon={<AlertTriangle className="h-5 w-5" />}
-            tone="destructive"
-          />
-        </section>
+        {/* Stat cards (admin only) */}
+        {isAdmin && (
+          <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <StatCard label="Total Students" value={stats?.totalStudents} loading={dataLoading} icon={<Users className="h-5 w-5" />} tone="primary" />
+            <StatCard label="Assessed" value={stats?.assessed} loading={dataLoading} icon={<ClipboardCheck className="h-5 w-5" />} tone="success" />
+            <StatCard label="Pending Assessment" value={stats?.pending} loading={dataLoading} icon={<FileText className="h-5 w-5" />} tone="warning" />
+            <StatCard label="High Complexity" value={stats?.highComplexity} loading={dataLoading} icon={<AlertTriangle className="h-5 w-5" />} tone="destructive" />
+          </section>
+        )}
 
-        {/* Quick actions */}
-        <section>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-            Quick Actions
-          </h2>
-          <div className="flex flex-wrap gap-3">
-            <Button onClick={() => setAddOpen(true)}>
-              <UserPlus className="h-4 w-4" />
-              Add Student
-            </Button>
-            <Button variant="outline" asChild>
-              <Link to="/admin">
-                <Users className="h-4 w-4" />
-                View All Students
-              </Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link to="/admin">
-                <FileText className="h-4 w-4" />
-                Assessments
-              </Link>
-            </Button>
-          </div>
-        </section>
-
-        {/* Recent students */}
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              Recent Students
+        {/* Quick actions (admin only) */}
+        {isAdmin && (
+          <section>
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+              Quick Actions
             </h2>
-          </div>
-          <Card>
-            <CardContent className="p-0">
-              {dataLoading ? (
-                <div className="p-6 text-sm text-muted-foreground">Loading students…</div>
-              ) : recent.length === 0 ? (
-                <div className="p-6 text-sm text-muted-foreground">
-                  No students yet. Use “Add Student” to enroll the first child.
-                </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Code</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Primary Condition</TableHead>
-                      <TableHead>Class</TableHead>
-                      <TableHead>Assessment</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {recent.map((s) => (
-                      <TableRow
-                        key={s.id}
-                        className="cursor-pointer hover:bg-muted/50"
-                        onClick={() => navigate({ to: "/students/$studentId", params: { studentId: s.id } })}
-                      >
-                        <TableCell className="font-mono text-xs">{s.student_code}</TableCell>
-                        <TableCell className="font-medium">{s.first_name}</TableCell>
-                        <TableCell>{s.primary_condition}</TableCell>
-                        <TableCell>{s.class_section ?? "—"}</TableCell>
-                        <TableCell>
-                          <StatusPill text={s.assessment_status} />
-                        </TableCell>
-                        <TableCell>
-                          <StatusPill text={s.status} />
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button variant="ghost" size="sm" asChild onClick={(e) => e.stopPropagation()}>
-                            <Link to="/students/$studentId" params={{ studentId: s.id }}>
-                              <Eye className="h-4 w-4" />
-                              View
-                            </Link>
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+            <div className="flex flex-wrap gap-3">
+              <Button onClick={() => setAddOpen(true)}>
+                <UserPlus className="h-4 w-4" /> Add Student
+              </Button>
+            </div>
+          </section>
+        )}
+
+        {/* Filters (admin & psychologist) */}
+        {(isAdmin || isPsych) && (
+          <section className="grid gap-3 sm:grid-cols-3">
+            <div>
+              <label className="text-xs font-semibold uppercase text-muted-foreground">
+                Filter by Section
+              </label>
+              <Select value={filterSection} onValueChange={setFilterSection}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__all">All sections</SelectItem>
+                  {SCHOOL_SECTIONS.map((s) => (
+                    <SelectItem key={s} value={s}>{SECTION_LABELS[s]}</SelectItem>
+                  ))}
+                  <SelectItem value="Uncategorized">Uncategorized</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase text-muted-foreground">
+                Filter by Assessment Status
+              </label>
+              <Select value={filterAssessment} onValueChange={setFilterAssessment}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__all">All</SelectItem>
+                  <SelectItem value="Not Yet Assessed">Not Yet Assessed</SelectItem>
+                  <SelectItem value="In Progress">In Progress</SelectItem>
+                  <SelectItem value="Pending Review">Pending Review</SelectItem>
+                  <SelectItem value="Diagnosis Confirmed">Diagnosis Confirmed</SelectItem>
+                  <SelectItem value="Assessed">Assessed</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase text-muted-foreground">
+                Filter by Intervention Status
+              </label>
+              <Select value={filterIntervention} onValueChange={setFilterIntervention}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__all">All</SelectItem>
+                  <SelectItem value="Active">Has active strategy</SelectItem>
+                  <SelectItem value="None">No active strategy</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </section>
+        )}
+
+        {/* Tabbed section views */}
+        <section>
+          <Tabs value={tab} onValueChange={setTab} className="w-full">
+            <TabsList className="flex flex-wrap gap-1 h-auto">
+              {isTeacher && (
+                <TabsTrigger value="mine">
+                  My Students <Badge n={myStudents.length} />
+                </TabsTrigger>
               )}
-            </CardContent>
-          </Card>
+              <TabsTrigger value="all">
+                All Students <Badge n={filtered.length} />
+              </TabsTrigger>
+              {SCHOOL_SECTIONS.map((sec) => {
+                const count = filtered.filter((s) => s.school_section === sec).length;
+                return (
+                  <TabsTrigger key={sec} value={sec}>
+                    {SECTION_SHORT[sec]} Section <Badge n={count} />
+                  </TabsTrigger>
+                );
+              })}
+              <TabsTrigger value="Uncategorized">
+                Uncategorized{" "}
+                <Badge n={filtered.filter((s) => !s.school_section).length} />
+              </TabsTrigger>
+            </TabsList>
+
+            {isTeacher && (
+              <TabsContent value="mine" className="mt-4">
+                <FlatList rows={myStudents} loading={dataLoading} navigate={navigate} />
+              </TabsContent>
+            )}
+
+            <TabsContent value="all" className="mt-4">
+              <FlatList rows={filtered} loading={dataLoading} navigate={navigate} />
+            </TabsContent>
+
+            {SCHOOL_SECTIONS.map((sec) => (
+              <TabsContent key={sec} value={sec} className="mt-4">
+                <GroupedSectionList
+                  section={sec}
+                  rows={filtered.filter((s) => s.school_section === sec)}
+                  loading={dataLoading}
+                  navigate={navigate}
+                />
+              </TabsContent>
+            ))}
+
+            <TabsContent value="Uncategorized" className="mt-4">
+              <FlatList
+                rows={filtered.filter((s) => !s.school_section)}
+                loading={dataLoading}
+                navigate={navigate}
+                emptyText="No uncategorized students."
+              />
+            </TabsContent>
+          </Tabs>
         </section>
       </main>
 
@@ -319,6 +401,175 @@ function AdminDashboard() {
         onCreated={() => setReloadKey((k) => k + 1)}
       />
     </div>
+  );
+}
+
+function Badge({ n }: { n: number }) {
+  return (
+    <span className="ml-2 inline-flex items-center justify-center rounded-full bg-primary/10 text-primary px-2 py-0.5 text-[10px] font-semibold">
+      {n}
+    </span>
+  );
+}
+
+function GroupedSectionList({
+  section,
+  rows,
+  loading,
+  navigate,
+}: {
+  section: SchoolSection;
+  rows: StudentRow[];
+  loading: boolean;
+  navigate: ReturnType<typeof useNavigate>;
+}) {
+  const groups: readonly string[] =
+    section === "ASD Section"
+      ? ASD_SUBS
+      : section === "MCC"
+        ? MCC_SUBS
+        : CLASS_SUBS;
+
+  if (loading) {
+    return <div className="p-6 text-sm text-muted-foreground">Loading…</div>;
+  }
+  if (rows.length === 0) {
+    return (
+      <div className="p-6 text-sm text-muted-foreground">
+        No students in {SECTION_LABELS[section]}.
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {groups.map((g) => {
+        const items = rows.filter((r) => r.sub_category === g);
+        if (items.length === 0) return null;
+        return (
+          <div key={g}>
+            <h3 className="text-sm font-semibold text-foreground mb-2">
+              {g} <span className="text-muted-foreground">({items.length})</span>
+            </h3>
+            <FlatList rows={items} loading={false} navigate={navigate} compact />
+          </div>
+        );
+      })}
+      {/* Any rows with sub_category outside the standard list */}
+      {(() => {
+        const others = rows.filter((r) => !groups.includes(r.sub_category as never));
+        if (others.length === 0) return null;
+        return (
+          <div>
+            <h3 className="text-sm font-semibold text-foreground mb-2">
+              Other / Unspecified ({others.length})
+            </h3>
+            <FlatList rows={others} loading={false} navigate={navigate} compact />
+          </div>
+        );
+      })()}
+    </div>
+  );
+}
+
+function FlatList({
+  rows,
+  loading,
+  navigate,
+  emptyText,
+  compact,
+}: {
+  rows: StudentRow[];
+  loading: boolean;
+  navigate: ReturnType<typeof useNavigate>;
+  emptyText?: string;
+  compact?: boolean;
+}) {
+  return (
+    <Card>
+      <CardContent className="p-0">
+        {loading ? (
+          <div className="p-6 text-sm text-muted-foreground">Loading students…</div>
+        ) : rows.length === 0 ? (
+          <div className="p-6 text-sm text-muted-foreground">
+            {emptyText ?? "No students match the current filters."}
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Section</TableHead>
+                <TableHead>Sub-Category</TableHead>
+                <TableHead>Student ID</TableHead>
+                <TableHead>Primary Condition</TableHead>
+                {!compact && <TableHead>Assessment</TableHead>}
+                {!compact && <TableHead>Status</TableHead>}
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.map((s) => (
+                <TableRow
+                  key={s.id}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() =>
+                    navigate({ to: "/students/$studentId", params: { studentId: s.id } })
+                  }
+                >
+                  <TableCell className="font-medium">
+                    {s.first_name}
+                    <div className="text-[11px] text-muted-foreground">
+                      {(s.school_section
+                        ? SECTION_SHORT[s.school_section as SchoolSection] ?? s.school_section
+                        : "Uncategorized")}
+                      {" | "}
+                      {s.sub_category ?? "—"}
+                      {" | ID: "}
+                      {s.student_code}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {s.school_section ? (
+                      <span className="inline-flex items-center rounded-md bg-indigo-100 text-indigo-900 px-2 py-0.5 text-xs font-medium">
+                        {SECTION_SHORT[s.school_section as SchoolSection] ?? s.school_section}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">Uncategorized</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-sm">{s.sub_category ?? "—"}</TableCell>
+                  <TableCell className="font-mono text-xs">{s.student_code}</TableCell>
+                  <TableCell>{s.primary_condition}</TableCell>
+                  {!compact && (
+                    <TableCell>
+                      <StatusPill text={s.assessment_status} />
+                    </TableCell>
+                  )}
+                  {!compact && (
+                    <TableCell>
+                      <StatusPill text={s.status} />
+                    </TableCell>
+                  )}
+                  <TableCell className="text-right">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      asChild
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Link to="/students/$studentId" params={{ studentId: s.id }}>
+                        <Eye className="h-4 w-4" /> View
+                      </Link>
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 

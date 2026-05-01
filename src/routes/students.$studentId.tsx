@@ -35,6 +35,8 @@ interface Student {
   priority_domain: string | null;
   priority_domain_start_date: string | null;
   intervention_status: string | null;
+  school_section: string | null;
+  sub_category: string | null;
 }
 
 function calcAge(dob: string): string {
@@ -61,7 +63,7 @@ function complexityClasses(flag: string | null): string {
 }
 
 const STUDENT_COLS =
-  "id, student_code, first_name, date_of_birth, gender, class_section, primary_condition, comorbid_conditions, under_observation, observation_notes, severity, complexity_flag, status, assessment_status, enrollment_date, priority_domain, priority_domain_start_date, intervention_status";
+  "id, student_code, first_name, date_of_birth, gender, class_section, primary_condition, comorbid_conditions, under_observation, observation_notes, severity, complexity_flag, status, assessment_status, enrollment_date, priority_domain, priority_domain_start_date, intervention_status, school_section, sub_category";
 
 function StudentProfilePage() {
   const { studentId } = Route.useParams();
@@ -167,11 +169,25 @@ function StudentProfilePage() {
           <CardContent className="p-6">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-mono text-muted-foreground">{student.student_code}</p>
+                <p className="text-xs font-mono text-muted-foreground">
+                  ID: {student.student_code}
+                </p>
                 <h1 className="text-2xl font-heading font-bold text-primary mt-1">
                   {student.first_name}
                 </h1>
-                <p className="text-sm text-muted-foreground mt-1">
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {student.school_section ? (
+                    <span className="inline-flex items-center rounded-md bg-indigo-600 text-white px-3 py-1 text-xs font-semibold">
+                      {student.school_section}
+                      {student.sub_category ? ` — ${student.sub_category}` : ""}
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center rounded-md bg-muted text-muted-foreground border border-border px-3 py-1 text-xs font-semibold">
+                      Uncategorized
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-muted-foreground mt-2">
                   {calcAge(student.date_of_birth)} · {student.gender ?? "—"} ·{" "}
                   {student.class_section ?? "No class"}
                 </p>

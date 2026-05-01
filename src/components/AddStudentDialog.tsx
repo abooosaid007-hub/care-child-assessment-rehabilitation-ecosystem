@@ -22,6 +22,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  SCHOOL_SECTIONS,
+  SECTION_LABELS,
+  subCategoriesFor,
+  type SchoolSection,
+} from "@/lib/school-sections";
 
 const PRIMARY_CONDITIONS = [
   "Autism Spectrum Disorder",
@@ -58,6 +64,8 @@ const schema = z.object({
   primary_condition: z.string().min(1, "Primary condition is required"),
   comorbid_conditions: z.array(z.string()),
   class_section: z.string().trim().max(50).optional(),
+  school_section: z.string().min(1, "School section is required"),
+  sub_category: z.string().min(1, "Sub-category is required"),
   severity: z.string().optional(),
   complexity_flag: z.string().optional(),
   observation_notes: z.string().trim().max(2000).optional(),
@@ -80,6 +88,8 @@ export function AddStudentDialog({ open, onOpenChange, onCreated }: Props) {
   const [severity, setSeverity] = useState<string>("");
   const [complexity, setComplexity] = useState<string>("");
   const [notes, setNotes] = useState("");
+  const [schoolSection, setSchoolSection] = useState<SchoolSection | "">("");
+  const [subCategory, setSubCategory] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   function reset() {
@@ -89,6 +99,8 @@ export function AddStudentDialog({ open, onOpenChange, onCreated }: Props) {
     setPrimaryCondition("");
     setComorbid([]);
     setClassSection("");
+    setSchoolSection("");
+    setSubCategory("");
     setSeverity("");
     setComplexity("");
     setNotes("");
@@ -112,6 +124,8 @@ export function AddStudentDialog({ open, onOpenChange, onCreated }: Props) {
       primary_condition: primaryCondition,
       comorbid_conditions: comorbid,
       class_section: classSection || undefined,
+      school_section: schoolSection,
+      sub_category: subCategory,
       severity: severity || undefined,
       complexity_flag: complexity || undefined,
       observation_notes: notes || undefined,
@@ -135,6 +149,8 @@ export function AddStudentDialog({ open, onOpenChange, onCreated }: Props) {
         primary_condition: parsed.data.primary_condition,
         comorbid_conditions: parsed.data.comorbid_conditions,
         class_section: parsed.data.class_section ?? null,
+        school_section: parsed.data.school_section,
+        sub_category: parsed.data.sub_category,
         severity: parsed.data.severity ?? null,
         complexity_flag: parsed.data.complexity_flag ?? null,
         observation_notes: parsed.data.observation_notes ?? null,
@@ -224,6 +240,52 @@ export function AddStudentDialog({ open, onOpenChange, onCreated }: Props) {
                 onChange={(e) => setClassSection(e.target.value)}
                 placeholder="e.g. Class A"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label>School Section *</Label>
+              <Select
+                value={schoolSection}
+                onValueChange={(v) => {
+                  setSchoolSection(v as SchoolSection);
+                  setSubCategory("");
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select school section" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SCHOOL_SECTIONS.map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {SECTION_LABELS[s]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Sub-Category *</Label>
+              <Select
+                value={subCategory}
+                onValueChange={setSubCategory}
+                disabled={!schoolSection}
+              >
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={
+                      schoolSection ? "Select sub-category" : "Select section first"
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {subCategoriesFor(schoolSection).map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {s}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
