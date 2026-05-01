@@ -243,6 +243,52 @@ export function AddStudentDialog({ open, onOpenChange, onCreated }: Props) {
             </div>
 
             <div className="space-y-2">
+              <Label>School Section *</Label>
+              <Select
+                value={schoolSection}
+                onValueChange={(v) => {
+                  setSchoolSection(v as SchoolSection);
+                  setSubCategory("");
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select school section" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SCHOOL_SECTIONS.map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {SECTION_LABELS[s]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Sub-Category *</Label>
+              <Select
+                value={subCategory}
+                onValueChange={setSubCategory}
+                disabled={!schoolSection}
+              >
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={
+                      schoolSection ? "Select sub-category" : "Select section first"
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {subCategoriesFor(schoolSection).map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {s}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
               <Label>Primary Condition *</Label>
               <Select value={primaryCondition} onValueChange={setPrimaryCondition}>
                 <SelectTrigger>
