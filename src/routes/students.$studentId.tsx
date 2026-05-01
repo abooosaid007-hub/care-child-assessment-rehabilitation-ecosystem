@@ -63,7 +63,7 @@ function complexityClasses(flag: string | null): string {
 }
 
 const STUDENT_COLS =
-  "id, student_code, first_name, date_of_birth, gender, class_section, primary_condition, comorbid_conditions, under_observation, observation_notes, severity, complexity_flag, status, assessment_status, enrollment_date, priority_domain, priority_domain_start_date, intervention_status";
+  "id, student_code, first_name, date_of_birth, gender, class_section, primary_condition, comorbid_conditions, under_observation, observation_notes, severity, complexity_flag, status, assessment_status, enrollment_date, priority_domain, priority_domain_start_date, intervention_status, school_section, sub_category";
 
 function StudentProfilePage() {
   const { studentId } = Route.useParams();
