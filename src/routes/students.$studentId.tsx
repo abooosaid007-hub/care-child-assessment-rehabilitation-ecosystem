@@ -169,11 +169,25 @@ function StudentProfilePage() {
           <CardContent className="p-6">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-mono text-muted-foreground">{student.student_code}</p>
+                <p className="text-xs font-mono text-muted-foreground">
+                  ID: {student.student_code}
+                </p>
                 <h1 className="text-2xl font-heading font-bold text-primary mt-1">
                   {student.first_name}
                 </h1>
-                <p className="text-sm text-muted-foreground mt-1">
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {student.school_section ? (
+                    <span className="inline-flex items-center rounded-md bg-indigo-600 text-white px-3 py-1 text-xs font-semibold">
+                      {student.school_section}
+                      {student.sub_category ? ` — ${student.sub_category}` : ""}
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center rounded-md bg-muted text-muted-foreground border border-border px-3 py-1 text-xs font-semibold">
+                      Uncategorized
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-muted-foreground mt-2">
                   {calcAge(student.date_of_birth)} · {student.gender ?? "—"} ·{" "}
                   {student.class_section ?? "No class"}
                 </p>
