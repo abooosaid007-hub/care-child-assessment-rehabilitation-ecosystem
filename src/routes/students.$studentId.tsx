@@ -411,7 +411,10 @@ function StudentProfilePage() {
           studentId={student.id}
           studentName={student.first_name}
           onClose={() => setPriorityOpen(false)}
-          onSelected={() => refetchStudent()}
+          onSelected={async () => {
+            await refetchStudent();
+            setOptionsOpen(true);
+          }}
         />
       )}
 
