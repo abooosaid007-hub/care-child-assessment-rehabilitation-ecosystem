@@ -348,11 +348,15 @@ function StudentProfilePage() {
           </CardContent>
         </Card>
 
-        {/* Intervention Review (14-day cycle + monthly progress score) */}
+        {/* Current Intervention Plan + 14-day cycle + monthly progress */}
         {student.priority_domain && (
           <InterventionReviewPanel
             studentId={student.id}
             priorityDomain={student.priority_domain}
+            onDomainChanged={async () => {
+              await refetchStudent();
+              if (canPickDomain) setPriorityOpen(true);
+            }}
           />
         )}
 
