@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { X, RefreshCw, CheckCircle2, Clock, AlertTriangle } from "lucide-react";
+import { X, RefreshCw, CheckCircle2, Clock, AlertTriangle, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 interface Props {
@@ -490,6 +490,3 @@ export function InterventionOptionsOverlay({
     </div>
   );
 }
-
-// Local icon import shim — Sparkles is used inline above.
-import { Sparkles } from "lucide-react";
