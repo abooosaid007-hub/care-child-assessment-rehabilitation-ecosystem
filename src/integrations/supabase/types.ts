@@ -216,14 +216,18 @@ export type Database = {
       }
       intervention_plans: {
         Row: {
+          approved_by: string | null
           assessment_id: string
           content: string | null
           created_at: string
           created_by: string | null
+          cycle_length_days: number
           generated_at: string
           id: string
           plan_type: string
+          plan_version: number
           priority_domain: string | null
+          replaced_at: string | null
           selected_strategy: string | null
           start_date: string | null
           status: string | null
@@ -231,14 +235,18 @@ export type Database = {
           title: string | null
         }
         Insert: {
+          approved_by?: string | null
           assessment_id: string
           content?: string | null
           created_at?: string
           created_by?: string | null
+          cycle_length_days?: number
           generated_at?: string
           id?: string
           plan_type: string
+          plan_version?: number
           priority_domain?: string | null
+          replaced_at?: string | null
           selected_strategy?: string | null
           start_date?: string | null
           status?: string | null
@@ -246,14 +254,18 @@ export type Database = {
           title?: string | null
         }
         Update: {
+          approved_by?: string | null
           assessment_id?: string
           content?: string | null
           created_at?: string
           created_by?: string | null
+          cycle_length_days?: number
           generated_at?: string
           id?: string
           plan_type?: string
+          plan_version?: number
           priority_domain?: string | null
+          replaced_at?: string | null
           selected_strategy?: string | null
           start_date?: string | null
           status?: string | null
