@@ -361,6 +361,16 @@ function StudentProfilePage() {
           />
         )}
 
+        <WeeklyAnalysisPanel
+          studentId={student.id}
+          studentName={student.first_name}
+          studentCode={student.student_code}
+          schoolSection={student.school_section}
+          subCategory={student.sub_category}
+          priorityDomain={student.priority_domain}
+          interventionStatus={student.intervention_status}
+        />
+
         {/* Section 4 — Enrollment */}
         <Card>
           <CardHeader>
