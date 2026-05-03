@@ -8,3 +8,6 @@ verify_jwt = true
 
 [functions.generate-intervention-options]
 verify_jwt = true
+
+[functions.generate-weekly-analysis]
+verify_jwt = true

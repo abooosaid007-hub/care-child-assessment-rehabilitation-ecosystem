@@ -10,6 +10,7 @@ import { DailyLogOverlay } from "@/components/DailyLogOverlay";
 import { PriorityDomainOverlay } from "@/components/PriorityDomainOverlay";
 import { InterventionOptionsOverlay } from "@/components/InterventionOptionsOverlay";
 import { InterventionReviewPanel } from "@/components/InterventionReviewPanel";
+import { WeeklyAnalysisPanel } from "@/components/WeeklyAnalysisPanel";
 
 export const Route = createFileRoute("/students/$studentId")({
   head: () => ({ meta: [{ title: "Student Profile — CARE" }] }),
@@ -359,6 +360,16 @@ function StudentProfilePage() {
             }}
           />
         )}
+
+        <WeeklyAnalysisPanel
+          studentId={student.id}
+          studentName={student.first_name}
+          studentCode={student.student_code}
+          schoolSection={student.school_section}
+          subCategory={student.sub_category}
+          priorityDomain={student.priority_domain}
+          interventionStatus={student.intervention_status}
+        />
 
         {/* Section 4 — Enrollment */}
         <Card>
