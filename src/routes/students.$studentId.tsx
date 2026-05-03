@@ -10,6 +10,7 @@ import { DailyLogOverlay } from "@/components/DailyLogOverlay";
 import { PriorityDomainOverlay } from "@/components/PriorityDomainOverlay";
 import { InterventionOptionsOverlay } from "@/components/InterventionOptionsOverlay";
 import { InterventionReviewPanel } from "@/components/InterventionReviewPanel";
+import { WeeklyAnalysisPanel } from "@/components/WeeklyAnalysisPanel";
 
 export const Route = createFileRoute("/students/$studentId")({
   head: () => ({ meta: [{ title: "Student Profile — CARE" }] }),
