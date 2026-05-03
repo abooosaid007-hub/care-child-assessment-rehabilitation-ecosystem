@@ -218,6 +218,7 @@ export type Database = {
         Row: {
           approved_by: string | null
           assessment_id: string
+          change_count: number
           content: string | null
           created_at: string
           created_by: string | null
@@ -237,6 +238,7 @@ export type Database = {
         Insert: {
           approved_by?: string | null
           assessment_id: string
+          change_count?: number
           content?: string | null
           created_at?: string
           created_by?: string | null
@@ -256,6 +258,7 @@ export type Database = {
         Update: {
           approved_by?: string | null
           assessment_id?: string
+          change_count?: number
           content?: string | null
           created_at?: string
           created_by?: string | null
@@ -313,6 +316,78 @@ export type Database = {
           full_name?: string | null
           id?: string
           role?: string
+        }
+        Relationships: []
+      }
+      progress_reports: {
+        Row: {
+          ai_analysis_output: string
+          avg_rating: number | null
+          baseline_comparison: number | null
+          confidence_level: string | null
+          created_at: string
+          created_by: string | null
+          dominant_trigger: string | null
+          id: string
+          incident_rate: number | null
+          intervention_plan_id: string | null
+          priority_domain: string
+          psychologist_status: string | null
+          rating_trend: string | null
+          recommended_action: string | null
+          report_week_end: string
+          report_week_start: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          strategy_compliance: number | null
+          student_id: string
+          teacher_reported_issue: string | null
+        }
+        Insert: {
+          ai_analysis_output: string
+          avg_rating?: number | null
+          baseline_comparison?: number | null
+          confidence_level?: string | null
+          created_at?: string
+          created_by?: string | null
+          dominant_trigger?: string | null
+          id?: string
+          incident_rate?: number | null
+          intervention_plan_id?: string | null
+          priority_domain: string
+          psychologist_status?: string | null
+          rating_trend?: string | null
+          recommended_action?: string | null
+          report_week_end: string
+          report_week_start: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          strategy_compliance?: number | null
+          student_id: string
+          teacher_reported_issue?: string | null
+        }
+        Update: {
+          ai_analysis_output?: string
+          avg_rating?: number | null
+          baseline_comparison?: number | null
+          confidence_level?: string | null
+          created_at?: string
+          created_by?: string | null
+          dominant_trigger?: string | null
+          id?: string
+          incident_rate?: number | null
+          intervention_plan_id?: string | null
+          priority_domain?: string
+          psychologist_status?: string | null
+          rating_trend?: string | null
+          recommended_action?: string | null
+          report_week_end?: string
+          report_week_start?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          strategy_compliance?: number | null
+          student_id?: string
+          teacher_reported_issue?: string | null
         }
         Relationships: []
       }
