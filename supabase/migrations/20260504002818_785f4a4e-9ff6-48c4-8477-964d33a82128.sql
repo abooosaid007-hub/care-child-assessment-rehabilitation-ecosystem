@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.lock_sent_parent_communications() FROM PUBLIC, anon, authenticated;
