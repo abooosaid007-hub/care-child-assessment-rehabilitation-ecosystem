@@ -292,6 +292,111 @@ export type Database = {
           },
         ]
       }
+      parent_communications: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          challenge_observation: string | null
+          communication_method: string | null
+          created_at: string
+          created_by: string | null
+          home_action: string | null
+          id: string
+          parent_response: string | null
+          positive_highlight: string | null
+          progress_report_id: string | null
+          response_type: string | null
+          sent_at: string | null
+          sent_by: string | null
+          status: string
+          student_id: string
+          summary_english: string
+          summary_urdu: string
+          week_end: string
+          week_start: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          challenge_observation?: string | null
+          communication_method?: string | null
+          created_at?: string
+          created_by?: string | null
+          home_action?: string | null
+          id?: string
+          parent_response?: string | null
+          positive_highlight?: string | null
+          progress_report_id?: string | null
+          response_type?: string | null
+          sent_at?: string | null
+          sent_by?: string | null
+          status?: string
+          student_id: string
+          summary_english: string
+          summary_urdu: string
+          week_end: string
+          week_start: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          challenge_observation?: string | null
+          communication_method?: string | null
+          created_at?: string
+          created_by?: string | null
+          home_action?: string | null
+          id?: string
+          parent_response?: string | null
+          positive_highlight?: string | null
+          progress_report_id?: string | null
+          response_type?: string | null
+          sent_at?: string | null
+          sent_by?: string | null
+          status?: string
+          student_id?: string
+          summary_english?: string
+          summary_urdu?: string
+          week_end?: string
+          week_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parent_communications_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parent_communications_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parent_communications_progress_report_id_fkey"
+            columns: ["progress_report_id"]
+            isOneToOne: false
+            referencedRelation: "progress_reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parent_communications_sent_by_fkey"
+            columns: ["sent_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parent_communications_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           active: boolean
