@@ -372,6 +372,12 @@ function StudentProfilePage() {
           interventionStatus={student.intervention_status}
         />
 
+        <ParentSummaryPanel
+          studentId={student.id}
+          studentName={student.first_name}
+          priorityDomain={student.priority_domain}
+        />
+
         {/* Section 4 — Enrollment */}
         <Card>
           <CardHeader>
