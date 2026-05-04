@@ -11,6 +11,7 @@ import { PriorityDomainOverlay } from "@/components/PriorityDomainOverlay";
 import { InterventionOptionsOverlay } from "@/components/InterventionOptionsOverlay";
 import { InterventionReviewPanel } from "@/components/InterventionReviewPanel";
 import { WeeklyAnalysisPanel } from "@/components/WeeklyAnalysisPanel";
+import { ParentSummaryPanel } from "@/components/ParentSummaryPanel";
 
 export const Route = createFileRoute("/students/$studentId")({
   head: () => ({ meta: [{ title: "Student Profile — CARE" }] }),
