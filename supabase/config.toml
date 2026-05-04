@@ -11,3 +11,6 @@ verify_jwt = true
 
 [functions.generate-weekly-analysis]
 verify_jwt = true
+
+[functions.generate-parent-summary]
+verify_jwt = true
