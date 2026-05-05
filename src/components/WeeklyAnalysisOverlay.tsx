@@ -27,6 +27,12 @@ interface DailyLog {
   strategy_used: string | null;
   non_compliance_reason: string | null;
   teacher_notes: string | null;
+  log_form_type: string | null;
+  field1_value: string | null;
+  field2_value: string | null;
+  field3_value: string | null;
+  field4_value: string | null;
+  teacher_confidence: string | null;
 }
 
 interface Props {
@@ -133,7 +139,7 @@ export function WeeklyAnalysisOverlay({
 
       const { data: lData, error: lErr } = await supabase
         .from("daily_logs")
-        .select("log_date, rating, context_trigger, incident_yes_no, incident_description, strategy_used, non_compliance_reason, teacher_notes")
+        .select("log_date, rating, context_trigger, incident_yes_no, incident_description, strategy_used, non_compliance_reason, teacher_notes, log_form_type, field1_value, field2_value, field3_value, field4_value, teacher_confidence")
         .eq("student_id", studentId)
         .gte("log_date", isoStart)
         .order("log_date", { ascending: true });
@@ -214,7 +220,11 @@ export function WeeklyAnalysisOverlay({
   const dailyLogLines = useMemo(() => {
     return logs.map((l, i) => {
       const ratingTxt = l.rating === 3 ? "High(3)" : l.rating === 2 ? "Medium(2)" : l.rating === 1 ? "Low(1)" : "—";
-      return `Day ${i + 1} (${l.log_date}): Rating=${ratingTxt}, Trigger=${l.context_trigger ?? "—"}, Incident=${l.incident_yes_no ? "Yes" : "No"}, Strategy Used=${l.strategy_used ?? "—"}, Note=${l.teacher_notes ?? "—"}`;
+      const formInfo = l.log_form_type
+        ? ` | Form=${l.log_form_type} | F1=${l.field1_value ?? "—"} | F2=${l.field2_value ?? "—"} | F3=${l.field3_value ?? "—"} | F4=${l.field4_value ?? "—"}`
+        : "";
+      const conf = l.teacher_confidence ? ` | Confidence=${l.teacher_confidence}` : "";
+      return `Day ${i + 1} (${l.log_date}): Rating=${ratingTxt}, Trigger=${l.context_trigger ?? "—"}, Incident=${l.incident_yes_no ? "Yes" : "No"}, Strategy Used=${l.strategy_used ?? "—"}, Note=${l.teacher_notes ?? "—"}${formInfo}${conf}`;
     });
   }, [logs]);
 
