@@ -192,13 +192,15 @@ export function DailyLogOverlay({
     };
 
     if (existingId) {
-      const updatePayload: Record<string, unknown> = { ...basePayload };
-      if (adminOverride) {
-        updatePayload.edit_reason = editReason.trim();
-        updatePayload.edited_by_admin = true;
-        updatePayload.admin_edited_at = new Date().toISOString();
-        updatePayload.admin_edited_by = user.id;
-      }
+      const updatePayload = adminOverride
+        ? {
+            ...basePayload,
+            edit_reason: editReason.trim(),
+            edited_by_admin: true,
+            admin_edited_at: new Date().toISOString(),
+            admin_edited_by: user.id,
+          }
+        : basePayload;
       const { error: upErr } = await supabase
         .from("daily_logs")
         .update(updatePayload)
