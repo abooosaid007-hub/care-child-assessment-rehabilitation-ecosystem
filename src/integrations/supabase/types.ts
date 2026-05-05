@@ -79,6 +79,8 @@ export type Database = {
       }
       daily_logs: {
         Row: {
+          admin_edited_at: string | null
+          admin_edited_by: string | null
           attention_level: number | null
           attention_minutes: number | null
           behavioral_incidents: number
@@ -86,6 +88,8 @@ export type Database = {
           created_at: string
           created_by: string | null
           domain: string | null
+          edit_reason: string | null
+          edited_by_admin: boolean
           emotional_regulation: number | null
           emotional_trigger: string | null
           id: string
@@ -93,6 +97,7 @@ export type Database = {
           incident_yes_no: boolean | null
           intervention_effectiveness: number | null
           intervention_used: string | null
+          last_modified_at: string
           log_date: string
           non_compliance_reason: string | null
           prompt_dependency: string | null
@@ -105,6 +110,8 @@ export type Database = {
           teacher_notes: string | null
         }
         Insert: {
+          admin_edited_at?: string | null
+          admin_edited_by?: string | null
           attention_level?: number | null
           attention_minutes?: number | null
           behavioral_incidents?: number
@@ -112,6 +119,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           domain?: string | null
+          edit_reason?: string | null
+          edited_by_admin?: boolean
           emotional_regulation?: number | null
           emotional_trigger?: string | null
           id?: string
@@ -119,6 +128,7 @@ export type Database = {
           incident_yes_no?: boolean | null
           intervention_effectiveness?: number | null
           intervention_used?: string | null
+          last_modified_at?: string
           log_date?: string
           non_compliance_reason?: string | null
           prompt_dependency?: string | null
@@ -131,6 +141,8 @@ export type Database = {
           teacher_notes?: string | null
         }
         Update: {
+          admin_edited_at?: string | null
+          admin_edited_by?: string | null
           attention_level?: number | null
           attention_minutes?: number | null
           behavioral_incidents?: number
@@ -138,6 +150,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           domain?: string | null
+          edit_reason?: string | null
+          edited_by_admin?: boolean
           emotional_regulation?: number | null
           emotional_trigger?: string | null
           id?: string
@@ -145,6 +159,7 @@ export type Database = {
           incident_yes_no?: boolean | null
           intervention_effectiveness?: number | null
           intervention_used?: string | null
+          last_modified_at?: string
           log_date?: string
           non_compliance_reason?: string | null
           prompt_dependency?: string | null

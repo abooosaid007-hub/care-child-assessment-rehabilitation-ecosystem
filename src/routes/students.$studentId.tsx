@@ -12,6 +12,7 @@ import { InterventionOptionsOverlay } from "@/components/InterventionOptionsOver
 import { InterventionReviewPanel } from "@/components/InterventionReviewPanel";
 import { WeeklyAnalysisPanel } from "@/components/WeeklyAnalysisPanel";
 import { ParentSummaryPanel } from "@/components/ParentSummaryPanel";
+import { DailyLogHistory } from "@/components/DailyLogHistory";
 
 export const Route = createFileRoute("/students/$studentId")({
   head: () => ({ meta: [{ title: "Student Profile — CARE" }] }),
@@ -373,6 +374,12 @@ function StudentProfilePage() {
         />
 
         <ParentSummaryPanel
+          studentId={student.id}
+          studentName={student.first_name}
+          priorityDomain={student.priority_domain}
+        />
+
+        <DailyLogHistory
           studentId={student.id}
           studentName={student.first_name}
           priorityDomain={student.priority_domain}
