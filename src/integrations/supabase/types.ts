@@ -92,6 +92,12 @@ export type Database = {
           edited_by_admin: boolean
           emotional_regulation: number | null
           emotional_trigger: string | null
+          field1_value: string | null
+          field2_value: string | null
+          field3_value: string | null
+          field4_value: string | null
+          field5_value: string | null
+          field6_value: string | null
           id: string
           incident_description: string | null
           incident_yes_no: boolean | null
@@ -99,6 +105,7 @@ export type Database = {
           intervention_used: string | null
           last_modified_at: string
           log_date: string
+          log_form_type: string | null
           non_compliance_reason: string | null
           prompt_dependency: string | null
           rating: number | null
@@ -107,6 +114,7 @@ export type Database = {
           skill_practiced: string | null
           strategy_used: string | null
           student_id: string
+          teacher_confidence: string | null
           teacher_notes: string | null
         }
         Insert: {
@@ -123,6 +131,12 @@ export type Database = {
           edited_by_admin?: boolean
           emotional_regulation?: number | null
           emotional_trigger?: string | null
+          field1_value?: string | null
+          field2_value?: string | null
+          field3_value?: string | null
+          field4_value?: string | null
+          field5_value?: string | null
+          field6_value?: string | null
           id?: string
           incident_description?: string | null
           incident_yes_no?: boolean | null
@@ -130,6 +144,7 @@ export type Database = {
           intervention_used?: string | null
           last_modified_at?: string
           log_date?: string
+          log_form_type?: string | null
           non_compliance_reason?: string | null
           prompt_dependency?: string | null
           rating?: number | null
@@ -138,6 +153,7 @@ export type Database = {
           skill_practiced?: string | null
           strategy_used?: string | null
           student_id: string
+          teacher_confidence?: string | null
           teacher_notes?: string | null
         }
         Update: {
@@ -154,6 +170,12 @@ export type Database = {
           edited_by_admin?: boolean
           emotional_regulation?: number | null
           emotional_trigger?: string | null
+          field1_value?: string | null
+          field2_value?: string | null
+          field3_value?: string | null
+          field4_value?: string | null
+          field5_value?: string | null
+          field6_value?: string | null
           id?: string
           incident_description?: string | null
           incident_yes_no?: boolean | null
@@ -161,6 +183,7 @@ export type Database = {
           intervention_used?: string | null
           last_modified_at?: string
           log_date?: string
+          log_form_type?: string | null
           non_compliance_reason?: string | null
           prompt_dependency?: string | null
           rating?: number | null
@@ -169,6 +192,7 @@ export type Database = {
           skill_practiced?: string | null
           strategy_used?: string | null
           student_id?: string
+          teacher_confidence?: string | null
           teacher_notes?: string | null
         }
         Relationships: [
