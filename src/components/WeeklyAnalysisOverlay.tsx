@@ -220,7 +220,11 @@ export function WeeklyAnalysisOverlay({
   const dailyLogLines = useMemo(() => {
     return logs.map((l, i) => {
       const ratingTxt = l.rating === 3 ? "High(3)" : l.rating === 2 ? "Medium(2)" : l.rating === 1 ? "Low(1)" : "—";
-      return `Day ${i + 1} (${l.log_date}): Rating=${ratingTxt}, Trigger=${l.context_trigger ?? "—"}, Incident=${l.incident_yes_no ? "Yes" : "No"}, Strategy Used=${l.strategy_used ?? "—"}, Note=${l.teacher_notes ?? "—"}`;
+      const formInfo = l.log_form_type
+        ? ` | Form=${l.log_form_type} | F1=${l.field1_value ?? "—"} | F2=${l.field2_value ?? "—"} | F3=${l.field3_value ?? "—"} | F4=${l.field4_value ?? "—"}`
+        : "";
+      const conf = l.teacher_confidence ? ` | Confidence=${l.teacher_confidence}` : "";
+      return `Day ${i + 1} (${l.log_date}): Rating=${ratingTxt}, Trigger=${l.context_trigger ?? "—"}, Incident=${l.incident_yes_no ? "Yes" : "No"}, Strategy Used=${l.strategy_used ?? "—"}, Note=${l.teacher_notes ?? "—"}${formInfo}${conf}`;
     });
   }, [logs]);
 
