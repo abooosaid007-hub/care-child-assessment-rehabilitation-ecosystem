@@ -27,6 +27,12 @@ interface DailyLog {
   strategy_used: string | null;
   non_compliance_reason: string | null;
   teacher_notes: string | null;
+  log_form_type: string | null;
+  field1_value: string | null;
+  field2_value: string | null;
+  field3_value: string | null;
+  field4_value: string | null;
+  teacher_confidence: string | null;
 }
 
 interface Props {
