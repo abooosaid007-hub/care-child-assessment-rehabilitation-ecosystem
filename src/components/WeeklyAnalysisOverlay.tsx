@@ -139,7 +139,7 @@ export function WeeklyAnalysisOverlay({
 
       const { data: lData, error: lErr } = await supabase
         .from("daily_logs")
-        .select("log_date, rating, context_trigger, incident_yes_no, incident_description, strategy_used, non_compliance_reason, teacher_notes")
+        .select("log_date, rating, context_trigger, incident_yes_no, incident_description, strategy_used, non_compliance_reason, teacher_notes, log_form_type, field1_value, field2_value, field3_value, field4_value, teacher_confidence")
         .eq("student_id", studentId)
         .gte("log_date", isoStart)
         .order("log_date", { ascending: true });
