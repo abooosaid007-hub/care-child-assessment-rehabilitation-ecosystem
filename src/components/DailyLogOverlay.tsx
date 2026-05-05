@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
@@ -8,31 +8,23 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { X, Lock } from "lucide-react";
 import { toast } from "sonner";
+import {
+  CONFIDENCE_OPTIONS,
+  getLogFormForCondition,
+  type LogFormConfig,
+} from "@/lib/log-forms";
 
 interface Props {
   studentId: string;
   studentName: string;
   priorityDomain: string | null;
-  /** If provided, open this specific log (view/edit a past or today's log). Otherwise creates/edits today's log. */
+  /** Optional: pass to skip a fetch */
+  primaryCondition?: string | null;
+  /** Open a specific log (history view/edit). Otherwise creates/edits today's log. */
   logId?: string;
   onClose: () => void;
   onSaved?: () => void;
 }
-
-const RATINGS: { v: 1 | 2 | 3; emoji: string; label: string }[] = [
-  { v: 1, emoji: "😐", label: "Low" },
-  { v: 2, emoji: "🙂", label: "Medium" },
-  { v: 3, emoji: "😊", label: "High" },
-];
-const TRIGGERS = ["Transition", "Noise", "Task", "Tired", "Home issue", "Unknown"];
-const STRATEGY = ["Yes", "No", "Partially"];
-const NON_COMPLIANCE_REASONS = [
-  "Time constraint",
-  "Child resistance",
-  "Forgot",
-  "Not suitable",
-  "Other",
-];
 
 function PillButton({
   active,
@@ -52,7 +44,7 @@ function PillButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`px-3 py-2 rounded-md text-sm border transition-colors ${
+      className={`px-3 py-2 rounded-md text-sm border transition-colors text-left ${
         active
           ? "bg-teal-600 text-white border-teal-600"
           : "bg-background border-border hover:bg-muted"
@@ -67,6 +59,7 @@ export function DailyLogOverlay({
   studentId,
   studentName,
   priorityDomain,
+  primaryCondition: primaryConditionProp,
   logId,
   onClose,
   onSaved,
@@ -75,6 +68,9 @@ export function DailyLogOverlay({
   const today = new Date().toISOString().slice(0, 10);
   const isPrivileged = profile?.role === "administrator" || profile?.role === "psychologist";
 
+  const [primaryCondition, setPrimaryCondition] = useState<string | null>(
+    primaryConditionProp ?? null,
+  );
   const [existingId, setExistingId] = useState<string | null>(null);
   const [logDate, setLogDate] = useState<string>(today);
   const [creatorName, setCreatorName] = useState<string | null>(null);
@@ -82,23 +78,30 @@ export function DailyLogOverlay({
   const [editedByAdmin, setEditedByAdmin] = useState(false);
   const [previousReason, setPreviousReason] = useState<string | null>(null);
 
-  const [rating, setRating] = useState<1 | 2 | 3 | null>(null);
-  const [trigger, setTrigger] = useState<string>("");
+  // Disability-specific form values
+  const [field1, setField1] = useState<string>("");
+  const [field2, setField2] = useState<string>("");
+  const [field3, setField3] = useState<string>("");
+  const [field4, setField4] = useState<string>("");
+  // Shared
   const [incident, setIncident] = useState<"Yes" | "No" | null>(null);
   const [incidentDesc, setIncidentDesc] = useState("");
-  const [strategy, setStrategy] = useState<string>("");
-  const [nonComplianceReason, setNonComplianceReason] = useState<string>("");
+  const [confidence, setConfidence] = useState<string>("");
   const [note, setNote] = useState("");
   const [editReason, setEditReason] = useState("");
 
   const [loadingExisting, setLoadingExisting] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [unknownWarning, setUnknownWarning] = useState<{ pct: number; total: number } | null>(null);
 
   const isPastDate = logDate < today;
   const readOnly = isPastDate && !isPrivileged;
   const adminOverride = isPastDate && isPrivileged;
+
+  const formCfg: LogFormConfig = useMemo(
+    () => getLogFormForCondition(primaryCondition),
+    [primaryCondition],
+  );
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -108,26 +111,39 @@ export function DailyLogOverlay({
     };
   }, []);
 
-  // Load existing log: by id, or today's log for student
+  // Fetch student primary_condition if not provided
+  useEffect(() => {
+    if (primaryConditionProp !== undefined && primaryConditionProp !== null) return;
+    (async () => {
+      const { data } = await supabase
+        .from("students")
+        .select("primary_condition")
+        .eq("id", studentId)
+        .maybeSingle();
+      setPrimaryCondition(data?.primary_condition ?? null);
+    })();
+  }, [studentId, primaryConditionProp]);
+
+  // Load existing log
   useEffect(() => {
     (async () => {
       setLoadingExisting(true);
       let query = supabase.from("daily_logs").select("*").eq("student_id", studentId);
-      if (logId) {
-        query = query.eq("id", logId);
-      } else {
-        query = query.eq("log_date", today);
-      }
+      if (logId) query = query.eq("id", logId);
+      else query = query.eq("log_date", today);
       const { data } = await query.maybeSingle();
       if (data) {
         setExistingId(data.id);
         setLogDate(data.log_date);
-        setRating((data.rating as 1 | 2 | 3) ?? null);
-        setTrigger(data.context_trigger ?? "");
-        setIncident(data.incident_yes_no === true ? "Yes" : data.incident_yes_no === false ? "No" : null);
+        setField1(data.field1_value ?? "");
+        setField2(data.field2_value ?? "");
+        setField3(data.field3_value ?? "");
+        setField4(data.field4_value ?? "");
+        setIncident(
+          data.incident_yes_no === true ? "Yes" : data.incident_yes_no === false ? "No" : null,
+        );
         setIncidentDesc(data.incident_description ?? "");
-        setStrategy(data.strategy_used ?? "");
-        setNonComplianceReason(data.non_compliance_reason ?? "");
+        setConfidence(data.teacher_confidence ?? "");
         setNote(data.teacher_notes ?? "");
         setCreatedAt(data.created_at);
         setEditedByAdmin(!!data.edited_by_admin);
@@ -145,34 +161,24 @@ export function DailyLogOverlay({
     })();
   }, [studentId, today, logId]);
 
-  // Data quality flag
-  useEffect(() => {
-    (async () => {
-      const since = new Date();
-      since.setDate(since.getDate() - 7);
-      const { data } = await supabase
-        .from("daily_logs")
-        .select("context_trigger")
-        .eq("student_id", studentId)
-        .gte("log_date", since.toISOString().slice(0, 10));
-      if (!data || data.length === 0) return;
-      const unknown = data.filter((r) => r.context_trigger === "Unknown").length;
-      const pct = (unknown / data.length) * 100;
-      if (pct > 40) setUnknownWarning({ pct: Math.round(pct), total: data.length });
-    })();
-  }, [studentId]);
+  const fieldStates = [
+    { val: field1, set: setField1 },
+    { val: field2, set: setField2 },
+    { val: field3, set: setField3 },
+    { val: field4, set: setField4 },
+  ];
 
   const submit = async () => {
     setError(null);
     if (readOnly) return;
     if (!user) return setError("Not authenticated.");
-    if (rating === null) return setError("Please select Domain Performance.");
-    if (!trigger) return setError("Please select a Context Trigger.");
-    if (!incident) return setError("Please indicate if there was a behavioral incident.");
-    if (!strategy) return setError("Please indicate if the intervention strategy was used.");
-    if ((strategy === "No" || strategy === "Partially") && !nonComplianceReason) {
-      return setError("Please select a reason the strategy was not fully used.");
+    for (let i = 0; i < formCfg.fields.length; i++) {
+      if (!fieldStates[i].val) {
+        return setError(`Please select: ${formCfg.fields[i].label}.`);
+      }
     }
+    if (!incident) return setError("Please indicate if there was a behavioral incident.");
+    if (!confidence) return setError("Please rate your observation confidence.");
     if (adminOverride && !editReason.trim()) {
       return setError("Reason for editing locked log is required.");
     }
@@ -180,14 +186,17 @@ export function DailyLogOverlay({
     setSaving(true);
     const basePayload = {
       domain: priorityDomain,
-      rating,
-      context_trigger: trigger,
+      log_form_type: formCfg.type,
+      field1_value: field1 || null,
+      field2_value: field2 || null,
+      field3_value: field3 || null,
+      field4_value: field4 || null,
+      field5_value: incident,
+      field6_value: note || null,
       incident_yes_no: incident === "Yes",
       incident_description: incident === "Yes" ? incidentDesc || null : null,
       behavioral_incidents: incident === "Yes" ? 1 : 0,
-      strategy_used: strategy,
-      non_compliance_reason:
-        strategy === "No" || strategy === "Partially" ? nonComplianceReason : null,
+      teacher_confidence: confidence,
       teacher_notes: note || null,
     };
 
@@ -219,7 +228,6 @@ export function DailyLogOverlay({
       if (insErr) {
         if (insErr.message.toLowerCase().includes("duplicate") || insErr.code === "23505") {
           setError("Today's log already exists. Refreshing to load it...");
-          // Trigger re-fetch
           const { data } = await supabase
             .from("daily_logs")
             .select("id")
@@ -247,7 +255,9 @@ export function DailyLogOverlay({
       <div className="sticky top-0 z-10 bg-card border-b border-border">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-sm font-semibold truncate">Daily Log — {studentName}</p>
+            <p className="text-sm font-semibold truncate">
+              Daily Log — {studentName} — {formCfg.title}
+            </p>
             <p className="text-xs text-muted-foreground">
               Priority Domain: {priorityDomain ?? "Not set"}
             </p>
@@ -268,7 +278,6 @@ export function DailyLogOverlay({
               <p className="text-sm text-muted-foreground">Loading…</p>
             ) : (
               <>
-                {/* Status banner */}
                 {readOnly ? (
                   <div className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-900">
                     <p className="font-semibold flex items-center gap-1">
@@ -280,11 +289,12 @@ export function DailyLogOverlay({
                 ) : adminOverride ? (
                   <div className="rounded-md border border-amber-400 bg-amber-50 p-3 text-sm text-amber-900">
                     <p className="font-semibold">⚠️ Admin Override — Editing locked log</p>
-                    <p className="text-xs mt-1">Past-date edits require a documented reason.</p>
                   </div>
                 ) : existingId ? (
                   <div className="rounded-md border border-yellow-300 bg-yellow-50 p-3 text-sm text-yellow-900">
-                    <p className="font-semibold">⚠️ Editing Today's Log — Changes will update existing entry</p>
+                    <p className="font-semibold">
+                      ⚠️ Editing Today's Log — Changes will update existing entry
+                    </p>
                     {creatorName && createdAt && (
                       <p className="text-xs mt-1">
                         Created by {creatorName} at {new Date(createdAt).toLocaleString()}
@@ -303,60 +313,35 @@ export function DailyLogOverlay({
                   </div>
                 )}
 
-                {!priorityDomain && !existingId && (
-                  <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
-                    No priority domain selected for this student.
-                  </div>
-                )}
-
-                {unknownWarning && (
-                  <div className="rounded-md border-2 border-orange-400 bg-orange-50 p-3 text-sm text-orange-900">
-                    <p className="font-semibold">⚠ Data quality flag</p>
-                    <p>
-                      {unknownWarning.pct}% of the last {unknownWarning.total} logs used "Unknown" as the trigger.
-                    </p>
-                  </div>
-                )}
-
                 {error && (
                   <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive break-words">
                     {error}
                   </div>
                 )}
 
-                <div>
-                  <Label>How was {priorityDomain ?? "the priority domain"} today?</Label>
-                  <div className="mt-2 grid grid-cols-3 gap-3">
-                    {RATINGS.map((r) => (
-                      <PillButton
-                        key={r.v}
-                        active={rating === r.v}
-                        onClick={() => setRating(r.v)}
-                        disabled={readOnly}
-                        className="py-5 text-base flex flex-col items-center gap-1"
-                      >
-                        <span className="text-2xl">{r.emoji}</span>
-                        <span>{r.label}</span>
-                      </PillButton>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <Label>What was happening during low/medium performance?</Label>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {TRIGGERS.map((t) => (
-                      <PillButton
-                        key={t}
-                        active={trigger === t}
-                        onClick={() => setTrigger(t)}
-                        disabled={readOnly}
-                      >
-                        {t}
-                      </PillButton>
-                    ))}
-                  </div>
-                </div>
+                {formCfg.fields.map((f, idx) => {
+                  const cols = f.cols ?? 2;
+                  const colClass =
+                    cols === 3 ? "grid-cols-3" : cols === 4 ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-2";
+                  const state = fieldStates[idx];
+                  return (
+                    <div key={f.label}>
+                      <Label>{f.label}</Label>
+                      <div className={`mt-2 grid ${colClass} gap-2`}>
+                        {f.options.map((opt) => (
+                          <PillButton
+                            key={opt}
+                            active={state.val === opt}
+                            onClick={() => state.set(opt)}
+                            disabled={readOnly}
+                          >
+                            {opt}
+                          </PillButton>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
 
                 <div>
                   <Label>Behavioral incident today?</Label>
@@ -365,7 +350,7 @@ export function DailyLogOverlay({
                       active={incident === "Yes"}
                       onClick={() => setIncident("Yes")}
                       disabled={readOnly}
-                      className="py-4"
+                      className="py-4 justify-center text-center"
                     >
                       Yes
                     </PillButton>
@@ -373,7 +358,7 @@ export function DailyLogOverlay({
                       active={incident === "No"}
                       onClick={() => setIncident("No")}
                       disabled={readOnly}
-                      className="py-4"
+                      className="py-4 justify-center text-center"
                     >
                       No
                     </PillButton>
@@ -393,58 +378,37 @@ export function DailyLogOverlay({
                 </div>
 
                 <div>
-                  <Label>Was today's intervention strategy used?</Label>
-                  <div className="mt-2 grid grid-cols-3 gap-2">
-                    {STRATEGY.map((s) => (
-                      <PillButton
-                        key={s}
-                        active={strategy === s}
-                        onClick={() => {
-                          setStrategy(s);
-                          if (s === "Yes") setNonComplianceReason("");
-                        }}
-                        disabled={readOnly}
-                      >
-                        {s}
-                      </PillButton>
-                    ))}
-                  </div>
-                  {(strategy === "No" || strategy === "Partially") && (
-                    <div className="mt-3">
-                      <Label htmlFor="ncr">Why not used?</Label>
-                      <select
-                        id="ncr"
-                        className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm disabled:opacity-60"
-                        value={nonComplianceReason}
-                        onChange={(e) => setNonComplianceReason(e.target.value)}
-                        disabled={readOnly}
-                      >
-                        <option value="">Select reason…</option>
-                        {NON_COMPLIANCE_REASONS.map((r) => (
-                          <option key={r} value={r}>
-                            {r}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <Label htmlFor="note">Teacher Note (optional)</Label>
+                  <Label htmlFor="note">Teacher Note (optional, 1 sentence)</Label>
                   <Textarea
                     id="note"
-                    rows={3}
-                    placeholder="One sentence observation (optional)"
+                    rows={2}
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                     disabled={readOnly}
                   />
                 </div>
 
+                <div>
+                  <Label>How confident are you about today's observations?</Label>
+                  <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    {CONFIDENCE_OPTIONS.map((c) => (
+                      <PillButton
+                        key={c.value}
+                        active={confidence === c.value}
+                        onClick={() => setConfidence(c.value)}
+                        disabled={readOnly}
+                      >
+                        {c.label}
+                      </PillButton>
+                    ))}
+                  </div>
+                </div>
+
                 {adminOverride && (
                   <div>
-                    <Label htmlFor="editReason">Reason for editing locked log <span className="text-destructive">*</span></Label>
+                    <Label htmlFor="editReason">
+                      Reason for editing locked log <span className="text-destructive">*</span>
+                    </Label>
                     <Textarea
                       id="editReason"
                       rows={2}
