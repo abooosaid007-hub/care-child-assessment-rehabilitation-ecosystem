@@ -379,6 +379,12 @@ function StudentProfilePage() {
           priorityDomain={student.priority_domain}
         />
 
+        <DailyLogHistory
+          studentId={student.id}
+          studentName={student.first_name}
+          priorityDomain={student.priority_domain}
+        />
+
         {/* Section 4 — Enrollment */}
         <Card>
           <CardHeader>
