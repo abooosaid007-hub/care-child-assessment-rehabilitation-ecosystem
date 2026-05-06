@@ -61,7 +61,7 @@ export function InterventionReviewPanel({ studentId, priorityDomain, onDomainCha
     (async () => {
       const { data: p } = await supabase
         .from("intervention_plans")
-        .select("id, selected_strategy, start_date, priority_domain, content, plan_version, cycle_length_days")
+        .select("id, selected_strategy, start_date, priority_domain, content, plan_version, cycle_length_days, ai_original_output, modification_type, refinement_count, final_version_source, custom_modified")
         .eq("student_id", studentId)
         .eq("status", "Active")
         .order("start_date", { ascending: false })
