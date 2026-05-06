@@ -255,18 +255,24 @@ export type Database = {
       }
       intervention_plans: {
         Row: {
+          ai_original_output: string | null
           approved_by: string | null
           assessment_id: string
           change_count: number
           content: string | null
           created_at: string
           created_by: string | null
+          custom_modified: boolean
           cycle_length_days: number
+          final_version_source: string | null
           generated_at: string
           id: string
+          modification_type: string | null
           plan_type: string
           plan_version: number
           priority_domain: string | null
+          psychologist_edits: Json | null
+          refinement_count: number
           replaced_at: string | null
           selected_strategy: string | null
           start_date: string | null
@@ -275,18 +281,24 @@ export type Database = {
           title: string | null
         }
         Insert: {
+          ai_original_output?: string | null
           approved_by?: string | null
           assessment_id: string
           change_count?: number
           content?: string | null
           created_at?: string
           created_by?: string | null
+          custom_modified?: boolean
           cycle_length_days?: number
+          final_version_source?: string | null
           generated_at?: string
           id?: string
+          modification_type?: string | null
           plan_type: string
           plan_version?: number
           priority_domain?: string | null
+          psychologist_edits?: Json | null
+          refinement_count?: number
           replaced_at?: string | null
           selected_strategy?: string | null
           start_date?: string | null
@@ -295,18 +307,24 @@ export type Database = {
           title?: string | null
         }
         Update: {
+          ai_original_output?: string | null
           approved_by?: string | null
           assessment_id?: string
           change_count?: number
           content?: string | null
           created_at?: string
           created_by?: string | null
+          custom_modified?: boolean
           cycle_length_days?: number
+          final_version_source?: string | null
           generated_at?: string
           id?: string
+          modification_type?: string | null
           plan_type?: string
           plan_version?: number
           priority_domain?: string | null
+          psychologist_edits?: Json | null
+          refinement_count?: number
           replaced_at?: string | null
           selected_strategy?: string | null
           start_date?: string | null
