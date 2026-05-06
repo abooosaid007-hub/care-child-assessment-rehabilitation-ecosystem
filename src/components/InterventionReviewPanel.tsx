@@ -204,6 +204,40 @@ export function InterventionReviewPanel({ studentId, priorityDomain, onDomainCha
               </div>
             </div>
 
+            <div className="flex flex-wrap gap-2 items-center">
+              {plan.final_version_source === "AI_Original" && (
+                <span className="inline-flex rounded-full bg-blue-600 text-white px-3 py-1 text-xs font-semibold">🤖 AI Generated</span>
+              )}
+              {plan.final_version_source === "Psychologist_Edit" && (
+                <span className="inline-flex rounded-full bg-amber-500 text-white px-3 py-1 text-xs font-semibold">✏️ Psychologist Modified</span>
+              )}
+              {plan.final_version_source === "AI_Refined" && (
+                <span className="inline-flex rounded-full bg-purple-600 text-white px-3 py-1 text-xs font-semibold">🔄 AI Refined</span>
+              )}
+              {plan.modification_type && (
+                <span className="inline-flex rounded-full bg-amber-100 text-amber-900 border border-amber-300 px-3 py-1 text-xs font-semibold">
+                  {plan.modification_type} change
+                </span>
+              )}
+              {(plan.refinement_count ?? 0) > 0 && (
+                <span className="inline-flex rounded-full bg-purple-100 text-purple-900 border border-purple-300 px-3 py-1 text-xs font-semibold">
+                  Refined {plan.refinement_count} time{plan.refinement_count === 1 ? "" : "s"}
+                </span>
+              )}
+              {plan.ai_original_output && (
+                <Button size="sm" variant="outline" onClick={() => setShowOriginal((v) => !v)}>
+                  {showOriginal ? "Hide Original AI Version" : "View Original AI Version"}
+                </Button>
+              )}
+            </div>
+
+            {showOriginal && plan.ai_original_output && (
+              <div className="rounded-md border border-border bg-muted/30 p-4 max-h-[40vh] overflow-y-auto">
+                <p className="text-xs uppercase text-muted-foreground mb-2">Original AI Output</p>
+                <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed">{plan.ai_original_output}</pre>
+              </div>
+            )}
+
             {reviewDue && (
               <div className="rounded-md border-2 border-amber-400 bg-amber-50 p-3 text-sm text-amber-900">
                 <p className="font-semibold">⏰ Cycle Complete — Review Required</p>
