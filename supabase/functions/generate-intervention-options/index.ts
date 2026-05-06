@@ -53,7 +53,10 @@ Deno.serve(async (req) => {
     const userContent =
       `STUDENT SUMMARY:\n${JSON.stringify(studentSummary ?? {}, null, 2)}\n\n` +
       `APPROVED ASSESSMENT:\n${approvedAssessment ?? ""}\n\n` +
-      (feedback ? `PSYCHOLOGIST FEEDBACK FOR REGENERATION:\n${feedback}\n` : "");
+      (previousOptions ? `PREVIOUS AI OPTIONS:\n${previousOptions}\n\n` : "") +
+      (feedback
+        ? `PSYCHOLOGIST REFINEMENT FEEDBACK:\n${feedback}\n\nINSTRUCTION: Regenerate intervention options incorporating this feedback. Modify strategy LOGIC, not just wording. Keep the same structure (Options A/B/C with When it works, When it fails, Difficulty, Action).\n`
+        : "");
 
     const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
