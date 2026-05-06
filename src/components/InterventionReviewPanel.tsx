@@ -16,6 +16,11 @@ interface ActivePlan {
   content: string | null;
   plan_version: number | null;
   cycle_length_days: number | null;
+  ai_original_output: string | null;
+  modification_type: string | null;
+  refinement_count: number | null;
+  final_version_source: string | null;
+  custom_modified: boolean | null;
 }
 
 interface Props {
