@@ -53,6 +53,7 @@ export function InterventionReviewPanel({ studentId, priorityDomain, onDomainCha
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [showFullPlan, setShowFullPlan] = useState(false);
+  const [showOriginal, setShowOriginal] = useState(false);
   const [confirmChange, setConfirmChange] = useState(false);
   const [discontinuing, setDiscontinuing] = useState(false);
 
