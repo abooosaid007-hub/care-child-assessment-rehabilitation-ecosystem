@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { studentSummary, approvedAssessment, priorityDomain, feedback } = await req.json();
+    const { studentSummary, approvedAssessment, priorityDomain, feedback, previousOptions } = await req.json();
     if (!priorityDomain) {
       return new Response(JSON.stringify({ error: "priorityDomain is required" }), {
         status: 400,
