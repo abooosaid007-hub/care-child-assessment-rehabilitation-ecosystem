@@ -352,7 +352,7 @@ export function InterventionOptionsOverlay({
       approved_by: profile?.id ?? null,
       created_by: profile?.id ?? null,
       ai_original_output: originalOutput ?? output ?? "",
-      psychologist_edits: editsPayload,
+      psychologist_edits: editsPayload as never,
       modification_type: chosen.edited ? chosen.modificationType : null,
       refinement_count: refinementCount,
       final_version_source: finalSource,
