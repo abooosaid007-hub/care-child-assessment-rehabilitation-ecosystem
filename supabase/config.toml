@@ -14,3 +14,6 @@ verify_jwt = true
 
 [functions.generate-parent-summary]
 verify_jwt = true
+
+[functions.generate-monthly-review]
+verify_jwt = true
