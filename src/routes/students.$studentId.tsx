@@ -381,6 +381,21 @@ function StudentProfilePage() {
           priorityDomain={student.priority_domain}
         />
 
+        <MonthlyReviewPanel
+          studentId={student.id}
+          studentName={student.first_name}
+          studentCode={student.student_code}
+          primaryCondition={student.primary_condition}
+          priorityDomain={student.priority_domain}
+          priorityDomainStartDate={student.priority_domain_start_date}
+          interventionStatus={student.intervention_status}
+          interventionCycleCount={student.intervention_cycle_count}
+          onChanged={async () => {
+            await refetchStudent();
+            if (canPickDomain && !student.priority_domain) setPriorityOpen(true);
+          }}
+        />
+
         <DailyLogHistory
           studentId={student.id}
           studentName={student.first_name}
