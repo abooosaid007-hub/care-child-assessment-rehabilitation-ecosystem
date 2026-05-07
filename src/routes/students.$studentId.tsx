@@ -40,6 +40,7 @@ interface Student {
   intervention_status: string | null;
   school_section: string | null;
   sub_category: string | null;
+  intervention_cycle_count: number | null;
 }
 
 function calcAge(dob: string): string {
@@ -66,7 +67,7 @@ function complexityClasses(flag: string | null): string {
 }
 
 const STUDENT_COLS =
-  "id, student_code, first_name, date_of_birth, gender, class_section, primary_condition, comorbid_conditions, under_observation, observation_notes, severity, complexity_flag, status, assessment_status, enrollment_date, priority_domain, priority_domain_start_date, intervention_status, school_section, sub_category";
+  "id, student_code, first_name, date_of_birth, gender, class_section, primary_condition, comorbid_conditions, under_observation, observation_notes, severity, complexity_flag, status, assessment_status, enrollment_date, priority_domain, priority_domain_start_date, intervention_status, school_section, sub_category, intervention_cycle_count";
 
 function StudentProfilePage() {
   const { studentId } = Route.useParams();
