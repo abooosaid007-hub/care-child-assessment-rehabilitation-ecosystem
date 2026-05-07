@@ -13,6 +13,7 @@ import { InterventionReviewPanel } from "@/components/InterventionReviewPanel";
 import { WeeklyAnalysisPanel } from "@/components/WeeklyAnalysisPanel";
 import { ParentSummaryPanel } from "@/components/ParentSummaryPanel";
 import { DailyLogHistory } from "@/components/DailyLogHistory";
+import { MonthlyReviewPanel } from "@/components/MonthlyReviewPanel";
 
 export const Route = createFileRoute("/students/$studentId")({
   head: () => ({ meta: [{ title: "Student Profile — CARE" }] }),
@@ -40,6 +41,7 @@ interface Student {
   intervention_status: string | null;
   school_section: string | null;
   sub_category: string | null;
+  intervention_cycle_count: number | null;
 }
 
 function calcAge(dob: string): string {
@@ -66,7 +68,7 @@ function complexityClasses(flag: string | null): string {
 }
 
 const STUDENT_COLS =
-  "id, student_code, first_name, date_of_birth, gender, class_section, primary_condition, comorbid_conditions, under_observation, observation_notes, severity, complexity_flag, status, assessment_status, enrollment_date, priority_domain, priority_domain_start_date, intervention_status, school_section, sub_category";
+  "id, student_code, first_name, date_of_birth, gender, class_section, primary_condition, comorbid_conditions, under_observation, observation_notes, severity, complexity_flag, status, assessment_status, enrollment_date, priority_domain, priority_domain_start_date, intervention_status, school_section, sub_category, intervention_cycle_count";
 
 function StudentProfilePage() {
   const { studentId } = Route.useParams();
@@ -377,6 +379,21 @@ function StudentProfilePage() {
           studentId={student.id}
           studentName={student.first_name}
           priorityDomain={student.priority_domain}
+        />
+
+        <MonthlyReviewPanel
+          studentId={student.id}
+          studentName={student.first_name}
+          studentCode={student.student_code}
+          primaryCondition={student.primary_condition}
+          priorityDomain={student.priority_domain}
+          priorityDomainStartDate={student.priority_domain_start_date}
+          interventionStatus={student.intervention_status}
+          interventionCycleCount={student.intervention_cycle_count}
+          onChanged={async () => {
+            await refetchStudent();
+            if (canPickDomain && !student.priority_domain) setPriorityOpen(true);
+          }}
         />
 
         <DailyLogHistory

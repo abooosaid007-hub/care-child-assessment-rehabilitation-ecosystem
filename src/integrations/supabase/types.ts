@@ -349,6 +349,84 @@ export type Database = {
           },
         ]
       }
+      monthly_reviews: {
+        Row: {
+          ai_review_output: string
+          average_rating_month: number | null
+          baseline_rating: number | null
+          change_from_baseline: number | null
+          confidence_level: string | null
+          created_at: string
+          created_by: string | null
+          current_rating: number | null
+          cycle_end_date: string
+          cycle_start_date: string
+          days_in_cycle: number | null
+          decided_at: string | null
+          decided_by: string | null
+          decision_made: string | null
+          id: string
+          incident_trend: string | null
+          intervention_plan_id: string | null
+          overall_trend: string | null
+          priority_domain: string
+          recommended_option: string | null
+          red_flags: string | null
+          strategy_compliance: number | null
+          student_id: string
+        }
+        Insert: {
+          ai_review_output: string
+          average_rating_month?: number | null
+          baseline_rating?: number | null
+          change_from_baseline?: number | null
+          confidence_level?: string | null
+          created_at?: string
+          created_by?: string | null
+          current_rating?: number | null
+          cycle_end_date: string
+          cycle_start_date: string
+          days_in_cycle?: number | null
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_made?: string | null
+          id?: string
+          incident_trend?: string | null
+          intervention_plan_id?: string | null
+          overall_trend?: string | null
+          priority_domain: string
+          recommended_option?: string | null
+          red_flags?: string | null
+          strategy_compliance?: number | null
+          student_id: string
+        }
+        Update: {
+          ai_review_output?: string
+          average_rating_month?: number | null
+          baseline_rating?: number | null
+          change_from_baseline?: number | null
+          confidence_level?: string | null
+          created_at?: string
+          created_by?: string | null
+          current_rating?: number | null
+          cycle_end_date?: string
+          cycle_start_date?: string
+          days_in_cycle?: number | null
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_made?: string | null
+          id?: string
+          incident_trend?: string | null
+          intervention_plan_id?: string | null
+          overall_trend?: string | null
+          priority_domain?: string
+          recommended_option?: string | null
+          red_flags?: string | null
+          strategy_compliance?: number | null
+          student_id?: string
+        }
+        Relationships: []
+      }
       parent_communications: {
         Row: {
           approved_at: string | null
@@ -566,6 +644,7 @@ export type Database = {
           first_name: string
           gender: string | null
           id: string
+          intervention_cycle_count: number
           intervention_status: string | null
           observation_notes: string | null
           primary_condition: string
@@ -590,6 +669,7 @@ export type Database = {
           first_name: string
           gender?: string | null
           id?: string
+          intervention_cycle_count?: number
           intervention_status?: string | null
           observation_notes?: string | null
           primary_condition: string
@@ -614,6 +694,7 @@ export type Database = {
           first_name?: string
           gender?: string | null
           id?: string
+          intervention_cycle_count?: number
           intervention_status?: string | null
           observation_notes?: string | null
           primary_condition?: string
