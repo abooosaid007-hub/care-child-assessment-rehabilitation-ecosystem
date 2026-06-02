@@ -246,6 +246,9 @@ function LoginPage() {
               "نئے اکاؤنٹس آپ کے ایڈمنسٹریٹر کے ذریعے بنائے جاتے ہیں۔"
             )}
           </p>
+          <p className="mt-3 text-center text-[11px] uppercase tracking-widest text-muted-foreground/70">
+            {t("Empowering Special Education through AI", "Empowering Special Education through AI")}
+          </p>
         </div>
       </main>
     </div>
