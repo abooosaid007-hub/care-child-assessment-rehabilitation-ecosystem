@@ -10,8 +10,8 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Sign in — CARE" },
-      { name: "description", content: "Sign in to CARE — Child Assessment and Rehabilitation Engine." },
+      { title: "Sign in — CARE System" },
+      { name: "description", content: "Sign in to CARE System — Child Assessment, Rehabilitation & Educational Ecosystem." },
     ],
   }),
   component: LoginPage,
@@ -100,9 +100,9 @@ function LoginPage() {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Top bar */}
       <header className="flex items-center justify-between px-6 py-4">
-        <div className="flex items-center gap-3">
-          <CareLogo size={36} />
-          <span className="font-heading font-semibold text-primary">CARE</span>
+        <div className="flex items-center gap-2">
+          <CareLogo size={32} />
+          <span className="font-heading font-semibold text-foreground">CARE System</span>
         </div>
         <div className="inline-flex items-center rounded-full border border-border bg-card p-0.5 text-sm shadow-sm">
           <button
@@ -114,6 +114,33 @@ function LoginPage() {
             aria-pressed={lang === "en"}
           >
             EN
+          </button>
+          <button
+            type="button"
+            onClick={() => setLang("ur")}
+            className={`px-3 py-1 rounded-full transition-colors ${
+              lang === "ur" ? "bg-primary text-primary-foreground" : "text-muted-foreground"
+            }`}
+            aria-pressed={lang === "ur"}
+          >
+            اردو
+          </button>
+        </div>
+      </header>
+
+      <main className="flex-1 flex items-center justify-center px-4 py-8">
+        <div className="w-full max-w-md">
+          <div className="flex flex-col items-center text-center mb-8">
+            <CareLogo size={120} />
+            <h1 className="mt-5 text-3xl font-heading font-bold tracking-tight text-foreground">
+              CARE System
+            </h1>
+            <p className="mt-2 text-sm font-medium text-muted-foreground">
+              {t(
+                "Child Assessment, Rehabilitation & Educational Ecosystem",
+                "Child Assessment, Rehabilitation & Educational Ecosystem"
+              )}
+            </p>
           </button>
           <button
             type="button"
