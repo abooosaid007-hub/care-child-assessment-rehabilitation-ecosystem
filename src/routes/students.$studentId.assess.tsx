@@ -490,7 +490,7 @@ function AssessmentPage() {
         assessment_date: f.assessment_date,
         assessment_type: f.assessment_type,
         consultant_name: f.consultant_name,
-        psychologist_status: "Submitted",
+        psychologist_status: "Pending",
       })
       .eq("id", id);
 
@@ -611,7 +611,7 @@ function AssessmentPage() {
     if (!id) return;
     const { error } = await supabase
       .from("assessments")
-      .update({ psychologist_status: "Awaiting Review" })
+      .update({ psychologist_status: "Pending" })
       .eq("id", id);
     if (error) {
       toast.error(`Send failed: ${error.message}`);
