@@ -1,5 +1,7 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
-import { AuthProvider } from "@/lib/auth-context";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } from "@tanstack/react-router";
+import { AuthProvider, useAuth } from "@/lib/auth-context";
+import { AppShell } from "@/components/AppShell";
+import { CareLogo } from "@/components/CareLogo";
 
 import appCss from "../styles.css?url";
 
@@ -30,14 +32,20 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "CARE System" },
+      {
+        name: "description",
+        content:
+          "CARE System — Child Assessment, Rehabilitation & Educational Ecosystem.",
+      },
+      { name: "author", content: "CARE System" },
+      { property: "og:title", content: "CARE System" },
+      {
+        property: "og:description",
+        content: "Child Assessment, Rehabilitation & Educational Ecosystem",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {
@@ -68,7 +76,38 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   return (
     <AuthProvider>
-      <Outlet />
+      <ShellGate />
     </AuthProvider>
+  );
+}
+
+/** Wrap authenticated pages in AppShell (sidebar + top bar). Bypass shell on /login and /. */
+function ShellGate() {
+  const path = useRouterState({ select: (r) => r.location.pathname });
+  const { user, profile, loading } = useAuth();
+
+  // Routes that always render bare (no sidebar)
+  const isBare = path === "/login" || path === "/";
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-4">
+        <CareLogo size={72} />
+        <p className="text-sm text-muted-foreground">Loading CARE System…</p>
+        <div className="h-1 w-32 overflow-hidden rounded-full bg-muted">
+          <div className="h-full w-1/3 bg-primary animate-pulse rounded-full" />
+        </div>
+      </div>
+    );
+  }
+
+  if (isBare || !user || !profile) {
+    return <Outlet />;
+  }
+
+  return (
+    <AppShell>
+      <Outlet />
+    </AppShell>
   );
 }

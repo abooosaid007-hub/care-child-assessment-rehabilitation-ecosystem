@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { CareLogo } from "@/components/CareLogo";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Table,
@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Users, ClipboardCheck, AlertTriangle, FileText, UserPlus, Eye } from "lucide-react";
+import { Users, ClipboardCheck, AlertTriangle, UserPlus, Eye, Target } from "lucide-react";
 import { AddStudentDialog } from "@/components/AddStudentDialog";
 import {
   SCHOOL_SECTIONS,
@@ -220,30 +220,8 @@ function AdminDashboard() {
             : "User";
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="bg-card border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <CareLogo size={36} />
-            <div>
-              <p className="font-heading font-semibold text-primary leading-tight">CARE</p>
-              <p className="text-xs text-muted-foreground leading-tight">
-                Child Assessment and Rehabilitation Engine
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="inline-flex items-center rounded-full bg-accent text-accent-foreground px-3 py-1 text-xs font-medium">
-              {roleLabel}
-            </span>
-            <Button onClick={signOut} variant="outline" size="sm">
-              Sign out
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+    <div className="min-h-full bg-background">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
         <div>
           <h1 className="text-2xl font-heading font-bold text-primary">
             Welcome,{" "}
@@ -265,10 +243,10 @@ function AdminDashboard() {
         {/* Stat cards (admin only) */}
         {isAdmin && (
           <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard label="Total Students" value={stats?.totalStudents} loading={dataLoading} icon={<Users className="h-5 w-5" />} tone="primary" />
-            <StatCard label="Assessed" value={stats?.assessed} loading={dataLoading} icon={<ClipboardCheck className="h-5 w-5" />} tone="success" />
-            <StatCard label="Pending Assessment" value={stats?.pending} loading={dataLoading} icon={<FileText className="h-5 w-5" />} tone="warning" />
-            <StatCard label="High Complexity" value={stats?.highComplexity} loading={dataLoading} icon={<AlertTriangle className="h-5 w-5" />} tone="destructive" />
+            <StatCard label="Total Students" value={stats?.totalStudents} loading={dataLoading} icon={<Users className="h-6 w-6" />} tone="navy" subtitle="Across all sections" />
+            <StatCard label="Assessments" value={stats?.assessed} loading={dataLoading} icon={<ClipboardCheck className="h-6 w-6" />} tone="teal" subtitle="Completed" />
+            <StatCard label="Active Interventions" value={stats?.pending} loading={dataLoading} icon={<Target className="h-6 w-6" />} tone="purple" subtitle="In progress" />
+            <StatCard label="High Complexity" value={stats?.highComplexity} loading={dataLoading} icon={<AlertTriangle className="h-6 w-6" />} tone="green" subtitle="Needs attention" />
           </section>
         )}
 
@@ -393,7 +371,7 @@ function AdminDashboard() {
             </TabsContent>
           </Tabs>
         </section>
-      </main>
+      </div>
 
       <AddStudentDialog
         open={addOpen}
@@ -579,31 +557,56 @@ function StatCard({
   loading,
   icon,
   tone,
+  subtitle,
 }: {
   label: string;
   value: number | undefined;
   loading: boolean;
   icon: React.ReactNode;
-  tone: "primary" | "success" | "warning" | "destructive";
+  tone: "navy" | "teal" | "purple" | "green";
+  subtitle?: string;
 }) {
-  const toneClasses: Record<typeof tone, string> = {
-    primary: "bg-primary/10 text-primary",
-    success: "bg-accent text-accent-foreground",
-    warning: "bg-secondary text-secondary-foreground",
-    destructive: "bg-destructive/10 text-destructive",
+  const toneStyles: Record<typeof tone, string> = {
+    navy: "var(--gradient-navy)",
+    teal: "var(--gradient-teal)",
+    purple: "var(--gradient-purple)",
+    green: "var(--gradient-green)",
   };
   return (
-    <Card>
-      <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">{label}</CardTitle>
-        <div className={`rounded-md p-2 ${toneClasses[tone]}`}>{icon}</div>
-      </CardHeader>
-      <CardContent>
-        <p className="text-3xl font-heading font-bold text-foreground">
-          {loading ? "…" : (value ?? 0)}
-        </p>
-      </CardContent>
-    </Card>
+    <div
+      className="relative overflow-hidden rounded-xl p-5 text-white shadow-md"
+      style={{
+        background: toneStyles[tone],
+        boxShadow: "0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.05)",
+      }}
+    >
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wider text-white/80">
+            {label}
+          </p>
+          <p className="mt-2 text-4xl font-heading font-bold leading-none">
+            {loading ? "…" : (value ?? 0)}
+          </p>
+          {subtitle && (
+            <p className="mt-2 text-xs text-white/70">{subtitle}</p>
+          )}
+        </div>
+        <div className="rounded-lg bg-white/15 p-2 backdrop-blur-sm">{icon}</div>
+      </div>
+      {/* Decorative wave */}
+      <svg
+        aria-hidden
+        className="absolute bottom-0 left-0 right-0 w-full opacity-25"
+        viewBox="0 0 200 30"
+        preserveAspectRatio="none"
+      >
+        <path
+          d="M0,20 C40,8 80,28 120,16 C160,4 180,22 200,14 L200,30 L0,30 Z"
+          fill="white"
+        />
+      </svg>
+    </div>
   );
 }
 
