@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Users, ClipboardCheck, AlertTriangle, FileText, UserPlus, Eye } from "lucide-react";
+import { Users, ClipboardCheck, AlertTriangle, UserPlus, Eye, Target } from "lucide-react";
 import { AddStudentDialog } from "@/components/AddStudentDialog";
 import {
   SCHOOL_SECTIONS,
