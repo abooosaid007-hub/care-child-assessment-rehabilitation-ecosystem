@@ -24,6 +24,7 @@ import {
 import { Users, ClipboardCheck, AlertTriangle, UserPlus, Eye, Target } from "lucide-react";
 import { AddStudentDialog } from "@/components/AddStudentDialog";
 import { AdminDashboardView } from "@/components/AdminDashboardView";
+import { PsychologistDashboardView } from "@/components/PsychologistDashboardView";
 import {
   SCHOOL_SECTIONS,
   SECTION_LABELS,
