@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Users, ClipboardCheck, AlertTriangle, UserPlus, Eye, Target } from "lucide-react";
 import { AddStudentDialog } from "@/components/AddStudentDialog";
+import { AdminDashboardView } from "@/components/AdminDashboardView";
 import {
   SCHOOL_SECTIONS,
   SECTION_LABELS,
@@ -208,16 +209,30 @@ function AdminDashboard() {
 
   if (!profile) return null;
 
+  if (isAdmin) {
+    return (
+      <div className="min-h-full bg-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+          <AdminDashboardView
+            adminName={
+              profile.full_name && profile.full_name.length > 0
+                ? profile.full_name
+                : profile.email ?? "Administrator"
+            }
+          />
+        </div>
+      </div>
+    );
+  }
+
   const roleLabel =
-    role === "administrator"
-      ? "Administrator"
-      : role === "psychologist"
-        ? "Psychologist"
-        : role === "teacher"
-          ? "Teacher"
-          : role === "speech_therapist"
-            ? "Speech Therapist"
-            : "User";
+    role === "psychologist"
+      ? "Psychologist"
+      : role === "teacher"
+        ? "Teacher"
+        : role === "speech_therapist"
+          ? "Speech Therapist"
+          : "User";
 
   return (
     <div className="min-h-full bg-background">
