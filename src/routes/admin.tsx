@@ -208,6 +208,22 @@ function AdminDashboard() {
 
   if (!profile) return null;
 
+  if (isAdmin) {
+    return (
+      <div className="min-h-full bg-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+          <AdminDashboardView
+            adminName={
+              profile.full_name && profile.full_name.length > 0
+                ? profile.full_name
+                : profile.email ?? "Administrator"
+            }
+          />
+        </div>
+      </div>
+    );
+  }
+
   const roleLabel =
     role === "administrator"
       ? "Administrator"
