@@ -24,6 +24,7 @@ import {
 import { Users, ClipboardCheck, AlertTriangle, UserPlus, Eye, Target } from "lucide-react";
 import { AddStudentDialog } from "@/components/AddStudentDialog";
 import { AdminDashboardView } from "@/components/AdminDashboardView";
+import { PsychologistDashboardView } from "@/components/PsychologistDashboardView";
 import {
   SCHOOL_SECTIONS,
   SECTION_LABELS,
@@ -225,14 +226,28 @@ function AdminDashboard() {
     );
   }
 
+  if (isPsych) {
+    return (
+      <div className="min-h-full bg-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+          <PsychologistDashboardView
+            name={
+              profile.full_name && profile.full_name.length > 0
+                ? profile.full_name
+                : profile.email ?? "Psychologist"
+            }
+          />
+        </div>
+      </div>
+    );
+  }
+
   const roleLabel =
-    role === "psychologist"
-      ? "Psychologist"
-      : role === "teacher"
-        ? "Teacher"
-        : role === "speech_therapist"
-          ? "Speech Therapist"
-          : "User";
+    role === "teacher"
+      ? "Teacher"
+      : role === "speech_therapist"
+        ? "Speech Therapist"
+        : "User";
 
   return (
     <div className="min-h-full bg-background">
