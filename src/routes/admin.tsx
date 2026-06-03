@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Users, ClipboardCheck, AlertTriangle, UserPlus, Eye, Target } from "lucide-react";
 import { AddStudentDialog } from "@/components/AddStudentDialog";
+import { AdminDashboardView } from "@/components/AdminDashboardView";
 import {
   SCHOOL_SECTIONS,
   SECTION_LABELS,
