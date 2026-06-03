@@ -243,13 +243,11 @@ function AdminDashboard() {
   }
 
   const roleLabel =
-    role === "psychologist"
-      ? "Psychologist"
-      : role === "teacher"
-        ? "Teacher"
-        : role === "speech_therapist"
-          ? "Speech Therapist"
-          : "User";
+    role === "teacher"
+      ? "Teacher"
+      : role === "speech_therapist"
+        ? "Speech Therapist"
+        : "User";
 
   return (
     <div className="min-h-full bg-background">
