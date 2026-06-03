@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { AddStudentDialog } from "@/components/AddStudentDialog";
 import {
   Users,
@@ -12,11 +11,7 @@ import {
   UserPlus,
   Send,
   ChevronRight,
-  Calendar,
-  FileText,
   MessageSquare,
-  Activity,
-  Phone,
 } from "lucide-react";
 import {
   SCHOOL_SECTIONS,
