@@ -123,14 +123,12 @@
   --sidebar-border: oklch(0.40 0.10 260);
   --sidebar-ring: oklch(0.71 0.13 220);
 
-  /* Shadows / gradients */
-  --shadow-card: 0 1px 3px rgb(0 0 0 / 0.08), 0 4px 12px rgb(0 0 0 / 0.05);
-  --shadow-elevated: 0 10px 30px -12px rgb(27 58 107 / 0.18);
-
-  --gradient-navy: linear-gradient(135deg, #1B3A6B, #2D5F8A);
-  --gradient-teal: linear-gradient(135deg, #00B4D8, #0096B8);
-  --gradient-purple: linear-gradient(135deg, #7B2D8B, #9B3DAB);
-  --gradient-green: linear-gradient(135deg, #52B788, #3D9A6E);
+  --gradient-navy: linear-gradient(135deg, #1B3A6B 0%, #2D5F8A 100%);
+  --gradient-teal: linear-gradient(135deg, #00B4D8 0%, #0096B8 100%);
+  --gradient-purple: linear-gradient(135deg, #7B2D8B 0%, #9B3DAB 100%);
+  --gradient-green: linear-gradient(135deg, #52B788 0%, #3D9A6E 100%);
+  --shadow-elevated: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.05);
   --gradient-amber: linear-gradient(135deg, #F4A261, #E08850);
 
   --font-heading: "DM Sans", ui-sans-serif, system-ui, sans-serif;
