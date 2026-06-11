@@ -247,12 +247,7 @@ function AdminDashboard() {
     return <TeacherDashboardView />;
   }
 
-  const roleLabel =
-    role === "teacher"
-      ? "Teacher"
-      : role === "speech_therapist"
-        ? "Speech Therapist"
-        : "User";
+  const roleLabel = "User";
 
   return (
     <div className="min-h-full bg-background">
