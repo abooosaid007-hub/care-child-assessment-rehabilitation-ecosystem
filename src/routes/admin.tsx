@@ -247,7 +247,7 @@ function AdminDashboard() {
     return <TeacherDashboardView />;
   }
 
-  const roleLabel = "User";
+
 
   return (
     <div className="min-h-full bg-background">
