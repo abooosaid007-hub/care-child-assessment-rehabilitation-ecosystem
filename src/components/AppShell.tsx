@@ -121,7 +121,7 @@ function CareSidebar() {
   const isAdmin = profile?.role === "administrator";
 
   return (
-    <Sidebar collapsible="icon" className="border-r-0">
+    <Sidebar collapsible="icon" className="border-r-0" style={{ backgroundColor: '#1B3A6B' }}>
       <SidebarHeader className="border-b border-sidebar-border/40 py-4">
         <div className="flex items-center gap-3 px-2">
           <div className="rounded-lg bg-white/95 p-1 shadow-sm shrink-0">
