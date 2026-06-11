@@ -25,6 +25,7 @@ import { Users, ClipboardCheck, AlertTriangle, UserPlus, Eye, Target } from "luc
 import { AddStudentDialog } from "@/components/AddStudentDialog";
 import { AdminDashboardView } from "@/components/AdminDashboardView";
 import { PsychologistDashboardView } from "@/components/PsychologistDashboardView";
+import { TeacherDashboardView } from "@/components/TeacherDashboardView";
 import {
   SCHOOL_SECTIONS,
   SECTION_LABELS,
