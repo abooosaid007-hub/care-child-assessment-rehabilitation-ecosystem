@@ -243,6 +243,10 @@ function AdminDashboard() {
     );
   }
 
+  if (isTeacher) {
+    return <TeacherDashboardView />;
+  }
+
   const roleLabel =
     role === "teacher"
       ? "Teacher"
