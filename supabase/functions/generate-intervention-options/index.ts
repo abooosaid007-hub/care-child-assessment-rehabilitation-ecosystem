@@ -65,11 +65,12 @@ Deno.serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: buildSystemPrompt(priorityDomain) },
           { role: "user", content: userContent },
         ],
+        max_completion_tokens: 8192,
       }),
     });
 
@@ -95,8 +96,14 @@ Deno.serve(async (req) => {
 
     const data = await aiResp.json();
     const output = data?.choices?.[0]?.message?.content ?? "";
+    const finishReason = data?.choices?.[0]?.finish_reason;
     if (!output) {
-      return new Response(JSON.stringify({ error: "AI returned empty output." }), {
+      console.error("Empty AI output", { finishReason, data: JSON.stringify(data).slice(0, 500) });
+      return new Response(JSON.stringify({
+        error: finishReason === "length"
+          ? "AI response was truncated (token limit). Try again."
+          : `AI returned empty output (finish: ${finishReason ?? "unknown"}).`,
+      }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
